@@ -3,8 +3,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import Index from "./pages/Index";
+import BrowsePage from "./pages/BrowsePage";
+import InstitutesPage from "./pages/InstitutesPage";
+import InstituteDetailsPage from "./pages/InstituteDetailsPage";
+import AdminPage from "./pages/AdminPage";
+import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -16,7 +20,14 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/browse" element={<BrowsePage />} />
+          <Route path="/browse/:divisionId" element={<BrowsePage />} />
+          <Route path="/browse/:divisionId/:districtId" element={<BrowsePage />} />
+          <Route path="/browse/:divisionId/:districtId/:upazilaId" element={<BrowsePage />} />
+          <Route path="/browse/:divisionId/:districtId/:upazilaId/:unionId" element={<BrowsePage />} />
+          <Route path="/institutes" element={<InstitutesPage />} />
+          <Route path="/institutes/:id" element={<InstituteDetailsPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
