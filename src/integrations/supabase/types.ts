@@ -14,7 +14,181 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      districts: {
+        Row: {
+          created_at: string
+          district_name: string
+          division_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          district_name: string
+          division_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          district_name?: string
+          division_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "districts_division_id_fkey"
+            columns: ["division_id"]
+            isOneToOne: false
+            referencedRelation: "divisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      divisions: {
+        Row: {
+          created_at: string
+          division_name: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          division_name: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          division_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      institutes: {
+        Row: {
+          address: string | null
+          created_at: string
+          id: string
+          name: string
+          phone: string | null
+          type: string
+          updated_at: string
+          village_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          phone?: string | null
+          type: string
+          updated_at?: string
+          village_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          type?: string
+          updated_at?: string
+          village_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "institutes_village_id_fkey"
+            columns: ["village_id"]
+            isOneToOne: false
+            referencedRelation: "villages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      unions: {
+        Row: {
+          created_at: string
+          id: string
+          union_name: string
+          upazila_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          union_name: string
+          upazila_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          union_name?: string
+          upazila_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unions_upazila_id_fkey"
+            columns: ["upazila_id"]
+            isOneToOne: false
+            referencedRelation: "upazilas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      upazilas: {
+        Row: {
+          created_at: string
+          district_id: string
+          id: string
+          upazila_name: string
+        }
+        Insert: {
+          created_at?: string
+          district_id: string
+          id?: string
+          upazila_name: string
+        }
+        Update: {
+          created_at?: string
+          district_id?: string
+          id?: string
+          upazila_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "upazilas_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "districts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      villages: {
+        Row: {
+          created_at: string
+          id: string
+          union_id: string
+          village_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          union_id: string
+          village_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          union_id?: string
+          village_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "villages_union_id_fkey"
+            columns: ["union_id"]
+            isOneToOne: false
+            referencedRelation: "unions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
