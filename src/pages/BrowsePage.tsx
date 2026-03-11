@@ -99,7 +99,7 @@ const BrowsePage = () => {
   });
 
   // Build breadcrumbs
-  const crumbs = [{ label: "Browse", to: "/browse" }];
+  const crumbs: { label: string; to?: string }[] = [{ label: "Browse", to: "/browse" }];
   if (divisionId && divisionName) crumbs.push({ label: divisionName, to: `/browse/${divisionId}` });
   if (districtId && districtName) crumbs.push({ label: districtName, to: `/browse/${divisionId}/${districtId}` });
   if (upazilaId && upazilaName) crumbs.push({ label: upazilaName, to: `/browse/${divisionId}/${districtId}/${upazilaId}` });
