@@ -242,6 +242,7 @@ const AdminPage = () => {
             <TabsTrigger value="unions">Unions</TabsTrigger>
             <TabsTrigger value="villages">Villages</TabsTrigger>
             <TabsTrigger value="institutes">Institutes</TabsTrigger>
+            {userRole === "super_admin" && <TabsTrigger value="roles">User Roles</TabsTrigger>}
           </TabsList>
 
           {/* Divisions */}
