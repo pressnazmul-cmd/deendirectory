@@ -102,6 +102,63 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          country: string
+          created_at: string
+          district_id: string | null
+          division_id: string | null
+          full_name: string
+          id: string
+          mobile: string
+          union_name: string | null
+          upazila: string | null
+          updated_at: string
+          village_name: string | null
+        }
+        Insert: {
+          country?: string
+          created_at?: string
+          district_id?: string | null
+          division_id?: string | null
+          full_name?: string
+          id: string
+          mobile?: string
+          union_name?: string | null
+          upazila?: string | null
+          updated_at?: string
+          village_name?: string | null
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          district_id?: string | null
+          division_id?: string | null
+          full_name?: string
+          id?: string
+          mobile?: string
+          union_name?: string | null
+          upazila?: string | null
+          updated_at?: string
+          village_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_district_id_fkey"
+            columns: ["district_id"]
+            isOneToOne: false
+            referencedRelation: "districts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_division_id_fkey"
+            columns: ["division_id"]
+            isOneToOne: false
+            referencedRelation: "divisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       unions: {
         Row: {
           created_at: string
@@ -160,6 +217,24 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       villages: {
         Row: {
           created_at: string
@@ -194,10 +269,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "super_admin" | "admin" | "editor" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -324,6 +405,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["super_admin", "admin", "editor", "user"],
+    },
   },
 } as const
