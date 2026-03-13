@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import RoleManagement from "@/components/RoleManagement";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,26 +16,17 @@ import { Trash2, Pencil, Plus } from "lucide-react";
 type Tab = "divisions" | "districts" | "upazilas" | "unions" | "villages" | "institutes";
 
 const AdminPage = () => {
-  const { user, loading } = useAuth();
+  const { user, userRole, loading } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
 
-  const { data: userRole, isLoading: roleLoading } = useQuery({
-    queryKey: ["user-role", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data } = await supabase.from("user_roles").select("role").eq("user_id", user!.id).single();
-      return data?.role ?? "user";
-    },
-  });
-
   useEffect(() => {
-    if (loading || roleLoading) return;
+    if (loading) return;
     if (!user || (userRole !== "super_admin" && userRole !== "admin")) {
       toast.error("Access denied. Admin only.");
       navigate("/");
     }
-  }, [user, loading, userRole, roleLoading, navigate]);
+  }, [user, loading, userRole, navigate]);
 
   // --- Divisions ---
   const { data: divisions } = useQuery({
@@ -250,6 +242,7 @@ const AdminPage = () => {
             <TabsTrigger value="unions">Unions</TabsTrigger>
             <TabsTrigger value="villages">Villages</TabsTrigger>
             <TabsTrigger value="institutes">Institutes</TabsTrigger>
+            {userRole === "super_admin" && <TabsTrigger value="roles">User Roles</TabsTrigger>}
           </TabsList>
 
           {/* Divisions */}
@@ -371,6 +364,12 @@ const AdminPage = () => {
               ))}
             </div>
           </TabsContent>
+
+          {userRole === "super_admin" && (
+            <TabsContent value="roles">
+              <RoleManagement />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
       <Footer />

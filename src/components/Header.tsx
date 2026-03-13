@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { GraduationCap, Menu, X, LogIn, UserPlus, User, LogOut } from "lucide-react";
+import { GraduationCap, Menu, X, LogIn, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,13 +13,15 @@ import {
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, userRole, signOut } = useAuth();
+
+  const isAdmin = userRole === "super_admin" || userRole === "admin";
 
   const links = [
     { to: "/", label: "Home" },
     { to: "/browse", label: "Browse" },
     { to: "/institutes", label: "Institutes" },
-    { to: "/admin", label: "Admin" },
+    ...(isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
   ];
 
   return (
@@ -69,15 +71,10 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <div className="hidden gap-1 md:flex">
-              <Link to="/auth">
-                <Button variant="ghost" size="sm" className="gap-1">
-                  <LogIn className="h-4 w-4" /> Sign In
-                </Button>
-              </Link>
+            <div className="hidden md:flex">
               <Link to="/auth">
                 <Button size="sm" className="gap-1">
-                  <UserPlus className="h-4 w-4" /> Sign Up
+                  <LogIn className="h-4 w-4" /> Sign In
                 </Button>
               </Link>
             </div>
@@ -111,15 +108,10 @@ const Header = () => {
             </Link>
           ))}
           {!user && (
-            <div className="mt-2 flex gap-2 border-t pt-2">
-              <Link to="/auth" onClick={() => setMobileOpen(false)} className="flex-1">
-                <Button variant="outline" size="sm" className="w-full gap-1">
-                  <LogIn className="h-4 w-4" /> Sign In
-                </Button>
-              </Link>
-              <Link to="/auth" onClick={() => setMobileOpen(false)} className="flex-1">
+            <div className="mt-2 border-t pt-2">
+              <Link to="/auth" onClick={() => setMobileOpen(false)} className="block">
                 <Button size="sm" className="w-full gap-1">
-                  <UserPlus className="h-4 w-4" /> Sign Up
+                  <LogIn className="h-4 w-4" /> Sign In
                 </Button>
               </Link>
             </div>
