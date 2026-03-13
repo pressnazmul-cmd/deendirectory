@@ -18,6 +18,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
+  userRole: string | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
