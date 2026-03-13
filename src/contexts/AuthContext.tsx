@@ -38,11 +38,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase.from("profiles").select("*").eq("id", userId).single();
     setProfile(data as Profile | null);
+  };
+
+  const fetchRole = async (userId: string) => {
+    const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId).single();
+    setUserRole(data?.role ?? "user");
   };
 
   useEffect(() => {
