@@ -16,26 +16,17 @@ import { Trash2, Pencil, Plus } from "lucide-react";
 type Tab = "divisions" | "districts" | "upazilas" | "unions" | "villages" | "institutes";
 
 const AdminPage = () => {
-  const { user, loading } = useAuth();
+  const { user, userRole, loading } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
 
-  const { data: userRole, isLoading: roleLoading } = useQuery({
-    queryKey: ["user-role", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data } = await supabase.from("user_roles").select("role").eq("user_id", user!.id).single();
-      return data?.role ?? "user";
-    },
-  });
-
   useEffect(() => {
-    if (loading || roleLoading) return;
+    if (loading) return;
     if (!user || (userRole !== "super_admin" && userRole !== "admin")) {
       toast.error("Access denied. Admin only.");
       navigate("/");
     }
-  }, [user, loading, userRole, roleLoading, navigate]);
+  }, [user, loading, userRole, navigate]);
 
   // --- Divisions ---
   const { data: divisions } = useQuery({
