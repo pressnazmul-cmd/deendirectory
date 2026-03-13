@@ -364,6 +364,12 @@ const AdminPage = () => {
               ))}
             </div>
           </TabsContent>
+
+          {userRole === "super_admin" && (
+            <TabsContent value="roles">
+              <RoleManagement />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
       <Footer />
