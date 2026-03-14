@@ -13,6 +13,7 @@ import {
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, profile, userRole, signOut } = useAuth();
 
   const isAdmin = userRole === "super_admin" || userRole === "admin";
