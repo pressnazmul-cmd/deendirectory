@@ -10,6 +10,7 @@ import InstitutesPage from "./pages/InstitutesPage";
 import InstituteDetailsPage from "./pages/InstituteDetailsPage";
 import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
+import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
