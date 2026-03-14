@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { GraduationCap, Menu, X, LogIn, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import {
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, profile, userRole, signOut } = useAuth();
 
   const isAdmin = userRole === "super_admin" || userRole === "admin";
@@ -64,6 +65,9 @@ const Header = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem className="text-xs text-muted-foreground" disabled>
                   {user.email}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/profile")} className="gap-2">
+                  <User className="h-4 w-4" /> Profile
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={signOut} className="gap-2 text-destructive">
                   <LogOut className="h-4 w-4" /> Sign Out
