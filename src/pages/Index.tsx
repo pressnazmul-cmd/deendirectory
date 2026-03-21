@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import BottomNav from "@/components/BottomNav";
+
 
 // Animated counter hook
 const useAnimatedCount = (target: number, duration = 1500) => {
