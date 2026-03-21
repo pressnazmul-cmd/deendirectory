@@ -215,6 +215,9 @@ const Index = () => {
 
       <div className="flex-1" />
       <Footer />
+      <BottomNav />
+      {/* spacer for bottom nav on mobile */}
+      <div className="h-20 md:hidden" />
     </div>
   );
 };
