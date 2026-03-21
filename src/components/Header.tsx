@@ -84,14 +84,7 @@ const Header = () => {
             </div>
           )}
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+          {/* Mobile menu button hidden - bottom nav handles mobile navigation */}
         </div>
       </div>
 

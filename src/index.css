@@ -84,6 +84,11 @@
   }
 }
 
+/* Safe area for bottom nav on notched phones */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 @layer base {
   * {
     @apply border-border;

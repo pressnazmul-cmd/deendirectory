@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
+
 // Animated counter hook
 const useAnimatedCount = (target: number, duration = 1500) => {
   const [count, setCount] = useState(0);
