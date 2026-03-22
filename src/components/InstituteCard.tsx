@@ -15,6 +15,7 @@ const typeColors: Record<string, string> = {
   School: "bg-primary/10 text-primary border-primary/20",
   College: "bg-accent/10 text-accent border-accent/20",
   Madrasa: "bg-secondary text-secondary-foreground border-border",
+  Mosque: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20",
 };
 
 const InstituteCard = ({ id, name, type, address, phone }: InstituteCardProps) => (

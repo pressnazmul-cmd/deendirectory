@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -5,10 +6,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, MapPin, Phone, ArrowLeft, Map } from "lucide-react";
+import { GraduationCap, MapPin, Phone, ArrowLeft, Map, Clock } from "lucide-react";
+import PrayerTimeModal from "@/components/PrayerTimeModal";
 
 const InstituteDetailsPage = () => {
   const { id } = useParams();
+  const [prayerOpen, setPrayerOpen] = useState(false);
 
   const { data: institute, isLoading } = useQuery({
     queryKey: ["institute", id],
@@ -81,6 +84,9 @@ const InstituteDetailsPage = () => {
               <Button variant="outline" className="gap-2" disabled>
                 <Map className="h-4 w-4" /> View on Map
               </Button>
+              <Button variant="outline" className="gap-2" onClick={() => setPrayerOpen(true)}>
+                <Clock className="h-4 w-4" /> Prayer Time
+              </Button>
             </div>
 
             {/* Map placeholder */}
@@ -91,6 +97,15 @@ const InstituteDetailsPage = () => {
         )}
       </main>
       <Footer />
+
+      {institute && (
+        <PrayerTimeModal
+          open={prayerOpen}
+          onOpenChange={setPrayerOpen}
+          instituteName={institute.name}
+          address={fullAddress || institute.address}
+        />
+      )}
     </div>
   );
 };
