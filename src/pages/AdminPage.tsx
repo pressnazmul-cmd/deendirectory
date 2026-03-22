@@ -368,6 +368,10 @@ const AdminPage = () => {
             </div>
           </TabsContent>
 
+          <TabsContent value="prayer-times">
+            <PrayerTimeManager />
+          </TabsContent>
+
           {userRole === "super_admin" && (
             <TabsContent value="roles">
               <RoleManagement />
