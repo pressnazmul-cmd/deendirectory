@@ -102,6 +102,47 @@ export type Database = {
           },
         ]
       }
+      prayer_times: {
+        Row: {
+          asr: string
+          dhuhr: string
+          fajr: string
+          id: string
+          institute_id: string
+          isha: string
+          maghrib: string
+          updated_at: string
+        }
+        Insert: {
+          asr?: string
+          dhuhr?: string
+          fajr?: string
+          id?: string
+          institute_id: string
+          isha?: string
+          maghrib?: string
+          updated_at?: string
+        }
+        Update: {
+          asr?: string
+          dhuhr?: string
+          fajr?: string
+          id?: string
+          institute_id?: string
+          isha?: string
+          maghrib?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prayer_times_institute_id_fkey"
+            columns: ["institute_id"]
+            isOneToOne: true
+            referencedRelation: "institutes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
