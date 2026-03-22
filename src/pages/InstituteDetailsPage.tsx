@@ -104,6 +104,7 @@ const InstituteDetailsPage = () => {
           onOpenChange={setPrayerOpen}
           instituteName={institute.name}
           address={fullAddress || institute.address}
+          instituteId={institute.id}
         />
       )}
     </div>

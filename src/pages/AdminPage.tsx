@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RoleManagement from "@/components/RoleManagement";
+import PrayerTimeManager from "@/components/PrayerTimeManager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -242,6 +243,7 @@ const AdminPage = () => {
             <TabsTrigger value="unions">Unions</TabsTrigger>
             <TabsTrigger value="villages">Villages</TabsTrigger>
             <TabsTrigger value="institutes">Institutes</TabsTrigger>
+            <TabsTrigger value="prayer-times">Prayer Times</TabsTrigger>
             {userRole === "super_admin" && <TabsTrigger value="roles">User Roles</TabsTrigger>}
           </TabsList>
 
@@ -364,6 +366,10 @@ const AdminPage = () => {
                 <ItemRow key={inst.id} name={`${inst.name} (${inst.type})`} sub={(inst.villages as any)?.village_name} onEdit={() => { setEditInstId(inst.id); setInstName(inst.name); setInstType(inst.type); setInstAddr(inst.address || ""); setInstPhone(inst.phone || ""); setInstVilId(inst.village_id); }} onDelete={() => deleteInstitute.mutate(inst.id)} />
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="prayer-times">
+            <PrayerTimeManager />
           </TabsContent>
 
           {userRole === "super_admin" && (
