@@ -63,6 +63,7 @@ const InstitutesPage = () => {
               <SelectItem value="School">School</SelectItem>
               <SelectItem value="College">College</SelectItem>
               <SelectItem value="Madrasa">Madrasa</SelectItem>
+              <SelectItem value="Mosque">Mosque</SelectItem>
             </SelectContent>
           </Select>
         </div>
