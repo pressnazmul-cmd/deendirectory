@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -20,22 +20,20 @@ const prayerLabels: Record<string, string> = {
 const PrayerTimeManager = () => {
   const qc = useQueryClient();
   const [selectedInstId, setSelectedInstId] = useState("");
-  const [times, setTimes] = useState({ fajr: "", dhuhr: "", asr: "", maghrib: "", isha: "" });
+  const [form, setForm] = useState({ fajr: "", dhuhr: "", asr: "", maghrib: "", isha: "" });
 
-  // Fetch only Mosque-type institutes
   const { data: mosques } = useQuery({
     queryKey: ["admin-mosques"],
     queryFn: async () => {
       const { data } = await supabase
         .from("institutes")
-        .select("id, name, address, villages(village_name)")
+        .select("id, name, villages(village_name)")
         .eq("type", "Mosque")
         .order("name");
       return data || [];
     },
   });
 
-  // Fetch existing prayer times for selected mosque
   const { data: existingTimes } = useQuery({
     queryKey: ["prayer-times", selectedInstId],
     queryFn: async () => {
@@ -50,33 +48,26 @@ const PrayerTimeManager = () => {
     enabled: !!selectedInstId,
   });
 
-  // When mosque changes, load existing times
-  const handleMosqueChange = (id: string) => {
-    setSelectedInstId(id);
-  };
-
-  // Sync form when existingTimes loads
-  const currentTimes = existingTimes
-    ? { fajr: existingTimes.fajr, dhuhr: existingTimes.dhuhr, asr: existingTimes.asr, maghrib: existingTimes.maghrib, isha: existingTimes.isha }
-    : times;
+  useEffect(() => {
+    if (existingTimes) {
+      setForm({
+        fajr: existingTimes.fajr || "",
+        dhuhr: existingTimes.dhuhr || "",
+        asr: existingTimes.asr || "",
+        maghrib: existingTimes.maghrib || "",
+        isha: existingTimes.isha || "",
+      });
+    } else {
+      setForm({ fajr: "", dhuhr: "", asr: "", maghrib: "", isha: "" });
+    }
+  }, [existingTimes, selectedInstId]);
 
   const savePrayerTimes = useMutation({
     mutationFn: async () => {
       if (!selectedInstId) throw new Error("Select a mosque first");
-      const payload = {
-        institute_id: selectedInstId,
-        fajr: currentTimes.fajr || times.fajr,
-        dhuhr: currentTimes.dhuhr || times.dhuhr,
-        asr: currentTimes.asr || times.asr,
-        maghrib: currentTimes.maghrib || times.maghrib,
-        isha: currentTimes.isha || times.isha,
-      };
-
+      const payload = { institute_id: selectedInstId, ...form };
       if (existingTimes) {
-        const { error } = await supabase.from("prayer_times").update({
-          ...payload,
-          updated_at: new Date().toISOString(),
-        }).eq("id", existingTimes.id);
+        const { error } = await supabase.from("prayer_times").update({ ...payload, updated_at: new Date().toISOString() }).eq("id", existingTimes.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from("prayer_times").insert(payload);
@@ -90,14 +81,6 @@ const PrayerTimeManager = () => {
     onError: (e: any) => toast.error(e.message),
   });
 
-  // We need local state that syncs with existingTimes
-  const [localTimes, setLocalTimes] = useState({ fajr: "", dhuhr: "", asr: "", maghrib: "", isha: "" });
-
-  // Update local state when existingTimes changes
-  const displayTimes = existingTimes
-    ? { fajr: existingTimes.fajr, dhuhr: existingTimes.dhuhr, asr: existingTimes.asr, maghrib: existingTimes.maghrib, isha: existingTimes.isha }
-    : localTimes;
-
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
@@ -107,10 +90,7 @@ const PrayerTimeManager = () => {
 
       <div>
         <Label>Select Mosque</Label>
-        <Select value={selectedInstId} onValueChange={(val) => {
-          handleMosqueChange(val);
-          setLocalTimes({ fajr: "", dhuhr: "", asr: "", maghrib: "", isha: "" });
-        }}>
+        <Select value={selectedInstId} onValueChange={setSelectedInstId}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Choose a mosque..." />
           </SelectTrigger>
@@ -126,37 +106,22 @@ const PrayerTimeManager = () => {
 
       {selectedInstId && (
         <div className="space-y-3 rounded-lg border bg-card p-4">
-          <p className="text-sm text-muted-foreground">
-            Set prayer times in 24-hour format (e.g. 04:30, 12:15, 18:45)
-          </p>
+          <p className="text-sm text-muted-foreground">Set prayer times in 24h format (e.g. 04:30)</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {prayerNames.map((name) => (
               <div key={name} className="flex items-center gap-2">
                 <Label className="w-28 shrink-0 text-sm">{prayerLabels[name]}</Label>
                 <Input
                   type="time"
-                  value={displayTimes[name]}
-                  onChange={(e) => {
-                    if (existingTimes) {
-                      // Directly update via invalidation after save
-                      // For now update local override
-                    }
-                    setLocalTimes((prev) => ({ ...prev, [name]: e.target.value }));
-                  }}
-                  className="w-full"
+                  value={form[name]}
+                  onChange={(e) => setForm((p) => ({ ...p, [name]: e.target.value }))}
                 />
               </div>
             ))}
           </div>
-          <Button
-            onClick={() => {
-              // merge localTimes with existingTimes for save
-              savePrayerTimes.mutate();
-            }}
-            className="gap-2 mt-2"
-          >
+          <Button onClick={() => savePrayerTimes.mutate()} className="gap-2 mt-2">
             <Save className="h-4 w-4" />
-            {existingTimes ? "Update Times" : "Save Times"}
+            {existingTimes ? "Update" : "Save"}
           </Button>
         </div>
       )}
