@@ -89,7 +89,9 @@ const PrayerTimeModal = ({ open, onOpenChange, instituteName, address, institute
   }, [open, manualTimes]);
 
   const formatTime = (t: string) => {
+    if (!t || !t.includes(":")) return { time: "--:--", ampm: "" };
     const [h, m] = t.split(":").map(Number);
+    if (isNaN(h) || isNaN(m)) return { time: "--:--", ampm: "" };
     const ampm = h >= 12 ? "PM" : "AM";
     const hour = h % 12 || 12;
     return { time: `${hour.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`, ampm };
