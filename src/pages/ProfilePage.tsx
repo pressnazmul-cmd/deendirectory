@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,6 @@ const compressImage = (file: File, maxSizeKB = 15): Promise<Blob> => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement("canvas");
-        // Resize to max 200x200
         let w = img.width, h = img.height;
         const maxDim = 200;
         if (w > maxDim || h > maxDim) {
@@ -32,13 +32,11 @@ const compressImage = (file: File, maxSizeKB = 15): Promise<Blob> => {
         const ctx = canvas.getContext("2d")!;
         ctx.drawImage(img, 0, 0, w, h);
 
-        // Binary search for quality to hit target size
         let lo = 0.1, hi = 0.9, blob: Blob | null = null;
         const tryCompress = (quality: number): Promise<Blob> =>
           new Promise((res) => canvas.toBlob((b) => res(b!), "image/jpeg", quality));
 
         (async () => {
-          // Try a few iterations
           for (let i = 0; i < 8; i++) {
             const mid = (lo + hi) / 2;
             blob = await tryCompress(mid);
@@ -62,6 +60,7 @@ const ProfilePage = () => {
   const { user, profile, loading } = useAuth();
   const qc = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useLanguage();
 
   const [isEditing, setIsEditing] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -109,12 +108,11 @@ const ProfilePage = () => {
     enabled: !!divisionId,
   });
 
-  // Get division/district names for display
   const divisionName = divisions?.find((d) => d.id === divisionId)?.division_name || "";
   const districtName = districts?.find((d) => d.id === districtId)?.district_name || "";
 
   const locationParts = [villageName, unionName, upazila, districtName, divisionName].filter(Boolean);
-  const locationString = locationParts.join(", ") || "ঠিকানা যোগ করুন";
+  const locationString = locationParts.join(", ") || t("ঠিকানা যোগ করুন", "Add address");
 
   const handleAvatarUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -135,19 +133,19 @@ const ProfilePage = () => {
 
       await supabase.from("profiles").update({ avatar_url: newUrl } as any).eq("id", user.id);
       setAvatarUrl(newUrl);
-      toast.success("ছবি আপলোড হয়েছে!");
+      toast.success(t("ছবি আপলোড হয়েছে!", "Photo uploaded!"));
       qc.invalidateQueries({ queryKey: ["profile"] });
     } catch (err: any) {
-      toast.error(err.message || "ছবি আপলোড ব্যর্থ হয়েছে");
+      toast.error(err.message || t("ছবি আপলোড ব্যর্থ হয়েছে", "Photo upload failed"));
     } finally {
       setUploading(false);
     }
-  }, [user, qc]);
+  }, [user, qc, t]);
 
   const updateProfile = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error("Not authenticated");
-      if (!fullName.trim() || !mobile.trim()) throw new Error("নাম এবং মোবাইল আবশ্যক");
+      if (!fullName.trim() || !mobile.trim()) throw new Error(t("নাম এবং মোবাইল আবশ্যক", "Name and mobile required"));
       const { error } = await supabase.from("profiles").update({
         full_name: fullName,
         mobile,
@@ -160,7 +158,7 @@ const ProfilePage = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("প্রোফাইল আপডেট হয়েছে!");
+      toast.success(t("প্রোফাইল আপডেট হয়েছে!", "Profile updated!"));
       setIsEditing(false);
       qc.invalidateQueries({ queryKey: ["profile"] });
       window.location.reload();
@@ -179,21 +177,15 @@ const ProfilePage = () => {
       <Header />
       <main className="container flex-1 py-8">
         <div className="mx-auto max-w-2xl">
-          <h1 className="mb-6 font-display text-2xl font-bold text-foreground">Profile</h1>
+          <h1 className="mb-6 font-display text-2xl font-bold text-foreground">{t("প্রোফাইল", "Profile")}</h1>
 
-          {/* Profile Header Card */}
           <div className="mb-6 overflow-hidden rounded-xl border bg-card">
             <div className="hero-gradient px-6 py-8">
               <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-                {/* Avatar */}
                 <div className="relative group">
                   <Avatar className="h-20 w-20 border-4 border-primary-foreground shadow-lg">
-                    {avatarUrl ? (
-                      <AvatarImage src={avatarUrl} alt={fullName} />
-                    ) : null}
-                    <AvatarFallback className="bg-secondary text-secondary-foreground text-xl font-bold">
-                      {initials}
-                    </AvatarFallback>
+                    {avatarUrl ? <AvatarImage src={avatarUrl} alt={fullName} /> : null}
+                    <AvatarFallback className="bg-secondary text-secondary-foreground text-xl font-bold">{initials}</AvatarFallback>
                   </Avatar>
                   <button
                     onClick={() => fileInputRef.current?.click()}
@@ -202,64 +194,45 @@ const ProfilePage = () => {
                   >
                     <Camera className="h-6 w-6 text-primary-foreground" />
                   </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarUpload}
-                    className="hidden"
-                  />
+                  <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
                 </div>
 
-                {/* Name & Info */}
                 <div className="flex-1">
                   <h2 className="text-xl font-bold text-primary-foreground">
-                    {fullName || "নাম যোগ করুন"}
+                    {fullName || t("নাম যোগ করুন", "Add name")}
                   </h2>
                   <div className="mt-1 flex flex-col gap-1 text-sm text-primary-foreground/80">
-                    <span className="flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5" /> {locationString}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Phone className="h-3.5 w-3.5" /> {mobile || "মোবাইল যোগ করুন"}
-                    </span>
+                    <span className="flex items-center gap-1.5"><MapPin className="h-3.5 w-3.5" /> {locationString}</span>
+                    <span className="flex items-center gap-1.5"><Phone className="h-3.5 w-3.5" /> {mobile || t("মোবাইল যোগ করুন", "Add mobile")}</span>
                   </div>
                 </div>
 
-                {/* Edit Button */}
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="gap-1.5"
-                  onClick={() => setIsEditing(!isEditing)}
-                >
+                <Button variant="secondary" size="sm" className="gap-1.5" onClick={() => setIsEditing(!isEditing)}>
                   <Pencil className="h-3.5 w-3.5" />
-                  {isEditing ? "বাতিল" : "Edit"}
+                  {isEditing ? t("বাতিল", "Cancel") : t("সম্পাদনা", "Edit")}
                 </Button>
               </div>
             </div>
 
-            {/* Personal Information - View Mode */}
             {!isEditing && (
               <div className="p-6">
                 <h3 className="mb-4 font-display text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  Personal Information
+                  {t("ব্যক্তিগত তথ্য", "Personal Information")}
                 </h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  <InfoItem label="নাম" value={fullName} />
-                  <InfoItem label="মোবাইল নম্বর" value={mobile} icon={<Phone className="h-3.5 w-3.5 text-muted-foreground" />} />
+                  <InfoItem label={t("নাম", "Name")} value={fullName} />
+                  <InfoItem label={t("মোবাইল নম্বর", "Mobile")} value={mobile} icon={<Phone className="h-3.5 w-3.5 text-muted-foreground" />} />
                   <InfoItem label="Email" value={user?.email || ""} />
-                  <InfoItem label="বিভাগ" value={divisionName} />
-                  <InfoItem label="জেলা" value={districtName} />
-                  <InfoItem label="উপজেলা" value={upazila} />
-                  <InfoItem label="ইউনিয়ন" value={unionName} />
-                  <InfoItem label="গ্রাম" value={villageName} />
+                  <InfoItem label={t("বিভাগ", "Division")} value={divisionName} />
+                  <InfoItem label={t("জেলা", "District")} value={districtName} />
+                  <InfoItem label={t("উপজেলা", "Upazila")} value={upazila} />
+                  <InfoItem label={t("ইউনিয়ন", "Union")} value={unionName} />
+                  <InfoItem label={t("গ্রাম", "Village")} value={villageName} />
                 </div>
 
-                {/* Profile Picture Upload Section */}
                 <div className="mt-6 border-t pt-4">
                   <h3 className="mb-3 font-display text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                    Profile Picture
+                    {t("প্রোফাইল ছবি", "Profile Picture")}
                   </h3>
                   <div
                     onClick={() => fileInputRef.current?.click()}
@@ -267,86 +240,81 @@ const ProfilePage = () => {
                   >
                     <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
                     <p className="text-sm font-medium text-primary">
-                      {uploading ? "আপলোড হচ্ছে..." : "Click to upload"} <span className="text-muted-foreground">or drag & drop</span>
+                      {uploading ? t("আপলোড হচ্ছে...", "Uploading...") : t("ক্লিক করে আপলোড করুন", "Click to upload")}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Max resolution 200×200px • Auto compressed to ~15KB
+                      {t("সর্বোচ্চ রেজোলিউশন 200×200px • স্বয়ংক্রিয় ~15KB", "Max resolution 200×200px • Auto compressed to ~15KB")}
                     </p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Edit Mode */}
             {isEditing && (
               <div className="space-y-4 p-6">
                 <h3 className="mb-2 font-display text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  তথ্য সম্পাদনা করুন
+                  {t("তথ্য সম্পাদনা করুন", "Edit Information")}
                 </h3>
 
                 <div>
-                  <Label className="text-muted-foreground text-xs">Email (পরিবর্তনযোগ্য নয়)</Label>
+                  <Label className="text-muted-foreground text-xs">{t("Email (পরিবর্তনযোগ্য নয়)", "Email (not editable)")}</Label>
                   <Input value={user?.email || ""} disabled className="bg-muted" />
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <Label>নাম *</Label>
-                    <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="আপনার পুরো নাম" />
+                    <Label>{t("নাম *", "Name *")}</Label>
+                    <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={t("আপনার পুরো নাম", "Your full name")} />
                   </div>
                   <div>
-                    <Label>মোবাইল নম্বর *</Label>
+                    <Label>{t("মোবাইল নম্বর *", "Mobile *")}</Label>
                     <Input value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="01XXXXXXXXX" />
                   </div>
                 </div>
 
                 <hr className="border-border" />
-                <p className="text-sm font-medium text-muted-foreground">ঠিকানা</p>
+                <p className="text-sm font-medium text-muted-foreground">{t("ঠিকানা", "Address")}</p>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <Label>Country</Label>
+                    <Label>{t("দেশ", "Country")}</Label>
                     <Input value="Bangladesh" disabled className="bg-muted" />
                   </div>
                   <div>
-                    <Label>Division</Label>
+                    <Label>{t("বিভাগ", "Division")}</Label>
                     <Select value={divisionId} onValueChange={(v) => { setDivisionId(v); setDistrictId(""); }}>
-                      <SelectTrigger><SelectValue placeholder="বিভাগ নির্বাচন করুন" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("বিভাগ নির্বাচন করুন", "Select division")} /></SelectTrigger>
                       <SelectContent>
-                        {divisions?.map((d) => (
-                          <SelectItem key={d.id} value={d.id}>{d.division_name}</SelectItem>
-                        ))}
+                        {divisions?.map((d) => <SelectItem key={d.id} value={d.id}>{d.division_name}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>District</Label>
+                    <Label>{t("জেলা", "District")}</Label>
                     <Select value={districtId} onValueChange={setDistrictId} disabled={!divisionId}>
-                      <SelectTrigger><SelectValue placeholder="জেলা নির্বাচন করুন" /></SelectTrigger>
+                      <SelectTrigger><SelectValue placeholder={t("জেলা নির্বাচন করুন", "Select district")} /></SelectTrigger>
                       <SelectContent>
-                        {districts?.map((d) => (
-                          <SelectItem key={d.id} value={d.id}>{d.district_name}</SelectItem>
-                        ))}
+                        {districts?.map((d) => <SelectItem key={d.id} value={d.id}>{d.district_name}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label>Upazila</Label>
-                    <Input value={upazila} onChange={(e) => setUpazila(e.target.value)} placeholder="উপজেলার নাম" />
+                    <Label>{t("উপজেলা", "Upazila")}</Label>
+                    <Input value={upazila} onChange={(e) => setUpazila(e.target.value)} placeholder={t("উপজেলার নাম", "Upazila name")} />
                   </div>
                   <div>
-                    <Label>Union</Label>
-                    <Input value={unionName} onChange={(e) => setUnionName(e.target.value)} placeholder="ইউনিয়নের নাম" />
+                    <Label>{t("ইউনিয়ন", "Union")}</Label>
+                    <Input value={unionName} onChange={(e) => setUnionName(e.target.value)} placeholder={t("ইউনিয়নের নাম", "Union name")} />
                   </div>
                   <div>
-                    <Label>Village</Label>
-                    <Input value={villageName} onChange={(e) => setVillageName(e.target.value)} placeholder="গ্রামের নাম" />
+                    <Label>{t("গ্রাম", "Village")}</Label>
+                    <Input value={villageName} onChange={(e) => setVillageName(e.target.value)} placeholder={t("গ্রামের নাম", "Village name")} />
                   </div>
                 </div>
 
                 <Button onClick={() => updateProfile.mutate()} className="w-full gap-2" disabled={updateProfile.isPending}>
                   <Save className="h-4 w-4" />
-                  {updateProfile.isPending ? "সংরক্ষণ হচ্ছে..." : "সংরক্ষণ করুন"}
+                  {updateProfile.isPending ? t("সংরক্ষণ হচ্ছে...", "Saving...") : t("সংরক্ষণ করুন", "Save")}
                 </Button>
               </div>
             )}

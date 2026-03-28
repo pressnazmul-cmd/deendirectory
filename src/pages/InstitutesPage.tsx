@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import InstituteCard from "@/components/InstituteCard";
@@ -19,6 +20,7 @@ const InstitutesPage = () => {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [page, setPage] = useState(0);
+  const { t } = useLanguage();
 
   const { data, isLoading } = useQuery({
     queryKey: ["institutes-list", villageId, search, typeFilter, page],
@@ -40,15 +42,15 @@ const InstitutesPage = () => {
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="container flex-1 py-8">
-        <Breadcrumbs items={[{ label: "Institutes" }]} />
-        <h1 className="mb-6 font-display text-2xl font-bold">Institutes</h1>
+        <Breadcrumbs items={[{ label: t("প্রতিষ্ঠান", "Institutes") }]} />
+        <h1 className="mb-6 font-display text-2xl font-bold">{t("প্রতিষ্ঠানসমূহ", "Institutes")}</h1>
 
         {/* Filters */}
         <div className="mb-6 flex flex-col gap-3 sm:flex-row">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search by name..."
+              placeholder={t("নাম দিয়ে খুঁজুন...", "Search by name...")}
               className="pl-10"
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(0); }}
@@ -56,22 +58,22 @@ const InstitutesPage = () => {
           </div>
           <Select value={typeFilter} onValueChange={(v) => { setTypeFilter(v); setPage(0); }}>
             <SelectTrigger className="w-full sm:w-40">
-              <SelectValue placeholder="All Types" />
+              <SelectValue placeholder={t("সকল ধরণ", "All Types")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="School">School</SelectItem>
-              <SelectItem value="College">College</SelectItem>
-              <SelectItem value="Madrasa">Madrasa</SelectItem>
-              <SelectItem value="Mosque">Mosque</SelectItem>
+              <SelectItem value="all">{t("সকল ধরণ", "All Types")}</SelectItem>
+              <SelectItem value="School">{t("স্কুল", "School")}</SelectItem>
+              <SelectItem value="College">{t("কলেজ", "College")}</SelectItem>
+              <SelectItem value="Madrasa">{t("মাদ্রাসা", "Madrasa")}</SelectItem>
+              <SelectItem value="Mosque">{t("মসজিদ", "Mosque")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {isLoading ? (
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">{t("লোড হচ্ছে...", "Loading...")}</p>
         ) : data?.items.length === 0 ? (
-          <p className="text-muted-foreground">No institutes found.</p>
+          <p className="text-muted-foreground">{t("কোন প্রতিষ্ঠান পাওয়া যায়নি।", "No institutes found.")}</p>
         ) : (
           <>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -85,7 +87,7 @@ const InstitutesPage = () => {
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <span className="text-sm text-muted-foreground">
-                  Page {page + 1} of {totalPages}
+                  {t(`পৃষ্ঠা ${page + 1} / ${totalPages}`, `Page ${page + 1} of ${totalPages}`)}
                 </span>
                 <Button variant="outline" size="sm" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>
                   <ChevronRight className="h-4 w-4" />

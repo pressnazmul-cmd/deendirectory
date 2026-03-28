@@ -1,20 +1,22 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, MapPin, Building2, User, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const BottomNav = () => {
   const location = useLocation();
   const { user, userRole } = useAuth();
+  const { t } = useLanguage();
   const isAdmin = userRole === "super_admin" || userRole === "admin";
 
   const navItems = [
-    { to: "/", icon: Home, label: "Home" },
-    { to: "/browse", icon: MapPin, label: "Browse" },
-    { to: "/institutes", icon: Building2, label: "Institutes" },
-    ...(isAdmin ? [{ to: "/admin", icon: Shield, label: "Admin" }] : []),
+    { to: "/", icon: Home, label: t("হোম", "Home") },
+    { to: "/browse", icon: MapPin, label: t("ব্রাউজ", "Browse") },
+    { to: "/institutes", icon: Building2, label: t("প্রতিষ্ঠান", "Institutes") },
+    ...(isAdmin ? [{ to: "/admin", icon: Shield, label: t("অ্যাডমিন", "Admin") }] : []),
     ...(user
-      ? [{ to: "/profile", icon: User, label: "Profile" }]
-      : [{ to: "/auth", icon: User, label: "Sign In" }]),
+      ? [{ to: "/profile", icon: User, label: t("প্রোফাইল", "Profile") }]
+      : [{ to: "/auth", icon: User, label: t("সাইন ইন", "Sign In") }]),
   ];
 
   const isActive = (path: string) => {
@@ -32,16 +34,12 @@ const BottomNav = () => {
               key={item.to}
               to={item.to}
               className={`flex flex-1 flex-col items-center gap-0.5 rounded-lg py-1.5 text-[10px] font-medium transition-colors ${
-                active
-                  ? "text-primary"
-                  : "text-muted-foreground"
+                active ? "text-primary" : "text-muted-foreground"
               }`}
             >
               <div
                 className={`flex h-8 w-8 items-center justify-center rounded-full transition-all ${
-                  active
-                    ? "bg-primary/10 scale-110"
-                    : ""
+                  active ? "bg-primary/10 scale-110" : ""
                 }`}
               >
                 <item.icon className="h-5 w-5" />
