@@ -27,23 +27,23 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <AuthProvider>
-          <div className="pb-16 md:pb-0">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/browse" element={<BrowsePage />} />
-              <Route path="/browse/:divisionId" element={<BrowsePage />} />
-              <Route path="/browse/:divisionId/:districtId" element={<BrowsePage />} />
-              <Route path="/browse/:divisionId/:districtId/:upazilaId" element={<BrowsePage />} />
-              <Route path="/browse/:divisionId/:districtId/:upazilaId/:unionId" element={<BrowsePage />} />
-              <Route path="/institutes" element={<InstitutesPage />} />
-              <Route path="/institutes/:id" element={<InstituteDetailsPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
-          <BottomNav />
+              <div className="pb-16 md:pb-0">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/browse" element={<BrowsePage />} />
+                  <Route path="/browse/:divisionId" element={<BrowsePage />} />
+                  <Route path="/browse/:divisionId/:districtId" element={<BrowsePage />} />
+                  <Route path="/browse/:divisionId/:districtId/:upazilaId" element={<BrowsePage />} />
+                  <Route path="/browse/:divisionId/:districtId/:upazilaId/:unionId" element={<BrowsePage />} />
+                  <Route path="/institutes" element={<InstitutesPage />} />
+                  <Route path="/institutes/:id" element={<InstituteDetailsPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/auth" element={<AuthPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+              <BottomNav />
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
