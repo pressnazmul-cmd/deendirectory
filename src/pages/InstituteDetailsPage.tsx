@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -12,6 +13,7 @@ import PrayerTimeModal from "@/components/PrayerTimeModal";
 const InstituteDetailsPage = () => {
   const { id } = useParams();
   const [prayerOpen, setPrayerOpen] = useState(false);
+  const { t } = useLanguage();
 
   const { data: institute, isLoading } = useQuery({
     queryKey: ["institute", id],
@@ -36,16 +38,16 @@ const InstituteDetailsPage = () => {
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="container flex-1 py-8">
-        <Breadcrumbs items={[{ label: "Institutes", to: "/institutes" }, { label: institute?.name || "Details" }]} />
+        <Breadcrumbs items={[{ label: t("প্রতিষ্ঠান", "Institutes"), to: "/institutes" }, { label: institute?.name || t("বিবরণ", "Details") }]} />
 
         <Link to="/institutes" className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Back to list
+          <ArrowLeft className="h-4 w-4" /> {t("তালিকায় ফিরুন", "Back to list")}
         </Link>
 
         {isLoading ? (
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">{t("লোড হচ্ছে...", "Loading...")}</p>
         ) : !institute ? (
-          <p className="text-muted-foreground">Institute not found.</p>
+          <p className="text-muted-foreground">{t("প্রতিষ্ঠান পাওয়া যায়নি।", "Institute not found.")}</p>
         ) : (
           <div className="mt-4 rounded-xl border bg-card p-6 md:p-8">
             <div className="mb-4 flex items-center gap-3">
@@ -77,21 +79,20 @@ const InstituteDetailsPage = () => {
               {institute.phone && (
                 <a href={`tel:${institute.phone}`}>
                   <Button className="gap-2">
-                    <Phone className="h-4 w-4" /> Call Now
+                    <Phone className="h-4 w-4" /> {t("কল করুন", "Call Now")}
                   </Button>
                 </a>
               )}
               <Button variant="outline" className="gap-2" disabled>
-                <Map className="h-4 w-4" /> View on Map
+                <Map className="h-4 w-4" /> {t("ম্যাপে দেখুন", "View on Map")}
               </Button>
               <Button variant="outline" className="gap-2" onClick={() => setPrayerOpen(true)}>
-                <Clock className="h-4 w-4" /> Prayer Time
+                <Clock className="h-4 w-4" /> {t("নামাজের সময়", "Prayer Time")}
               </Button>
             </div>
 
-            {/* Map placeholder */}
             <div className="mt-6 flex h-48 items-center justify-center rounded-xl bg-secondary text-sm text-muted-foreground">
-              Map location placeholder
+              {t("ম্যাপ লোকেশন প্লেসহোল্ডার", "Map location placeholder")}
             </div>
           </div>
         )}

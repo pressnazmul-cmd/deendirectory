@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LocationCard from "@/components/LocationCard";
@@ -8,8 +9,8 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 
 const BrowsePage = () => {
   const { divisionId, districtId, upazilaId, unionId } = useParams();
+  const { t } = useLanguage();
 
-  // Fetch divisions
   const { data: divisions } = useQuery({
     queryKey: ["divisions"],
     queryFn: async () => {
@@ -20,7 +21,6 @@ const BrowsePage = () => {
     enabled: !divisionId,
   });
 
-  // Fetch districts
   const { data: districts } = useQuery({
     queryKey: ["districts", divisionId],
     queryFn: async () => {
@@ -31,7 +31,6 @@ const BrowsePage = () => {
     enabled: !!divisionId && !districtId,
   });
 
-  // Fetch upazilas
   const { data: upazilas } = useQuery({
     queryKey: ["upazilas", districtId],
     queryFn: async () => {
@@ -42,7 +41,6 @@ const BrowsePage = () => {
     enabled: !!districtId && !upazilaId,
   });
 
-  // Fetch unions
   const { data: unions } = useQuery({
     queryKey: ["unions", upazilaId],
     queryFn: async () => {
@@ -53,7 +51,6 @@ const BrowsePage = () => {
     enabled: !!upazilaId && !unionId,
   });
 
-  // Fetch villages
   const { data: villages } = useQuery({
     queryKey: ["villages", unionId],
     queryFn: async () => {
@@ -64,7 +61,6 @@ const BrowsePage = () => {
     enabled: !!unionId,
   });
 
-  // Breadcrumb names
   const { data: divisionName } = useQuery({
     queryKey: ["division-name", divisionId],
     queryFn: async () => {
@@ -98,31 +94,29 @@ const BrowsePage = () => {
     enabled: !!unionId,
   });
 
-  // Build breadcrumbs
-  const crumbs: { label: string; to?: string }[] = [{ label: "Browse", to: "/browse" }];
+  const crumbs: { label: string; to?: string }[] = [{ label: t("ব্রাউজ", "Browse"), to: "/browse" }];
   if (divisionId && divisionName) crumbs.push({ label: divisionName, to: `/browse/${divisionId}` });
   if (districtId && districtName) crumbs.push({ label: districtName, to: `/browse/${divisionId}/${districtId}` });
   if (upazilaId && upazilaName) crumbs.push({ label: upazilaName, to: `/browse/${divisionId}/${districtId}/${upazilaId}` });
   if (unionId && unionName) crumbs.push({ label: unionName });
 
-  // Determine what to show
-  let title = "Select a Division";
+  let title = t("একটি বিভাগ নির্বাচন করুন", "Select a Division");
   let items: { name: string; to: string }[] = [];
 
   if (unionId && villages) {
-    title = `Villages in ${unionName || "Union"}`;
+    title = t(`${unionName || "ইউনিয়ন"}-এর গ্রামসমূহ`, `Villages in ${unionName || "Union"}`);
     items = villages.map((v) => ({ name: v.village_name, to: `/institutes?village=${v.id}` }));
   } else if (upazilaId && unions) {
-    title = `Unions in ${upazilaName || "Upazila"}`;
+    title = t(`${upazilaName || "উপজেলা"}-এর ইউনিয়নসমূহ`, `Unions in ${upazilaName || "Upazila"}`);
     items = unions.map((u) => ({ name: u.union_name, to: `/browse/${divisionId}/${districtId}/${upazilaId}/${u.id}` }));
   } else if (districtId && upazilas) {
-    title = `Upazilas in ${districtName || "District"}`;
+    title = t(`${districtName || "জেলা"}-এর উপজেলাসমূহ`, `Upazilas in ${districtName || "District"}`);
     items = upazilas.map((u) => ({ name: u.upazila_name, to: `/browse/${divisionId}/${districtId}/${u.id}` }));
   } else if (divisionId && districts) {
-    title = `Districts in ${divisionName || "Division"}`;
+    title = t(`${divisionName || "বিভাগ"}-এর জেলাসমূহ`, `Districts in ${divisionName || "Division"}`);
     items = districts.map((d) => ({ name: d.district_name, to: `/browse/${divisionId}/${d.id}` }));
   } else if (divisions) {
-    title = "Select a Division";
+    title = t("একটি বিভাগ নির্বাচন করুন", "Select a Division");
     items = divisions.map((d) => ({ name: d.division_name, to: `/browse/${d.id}` }));
   }
 
@@ -133,7 +127,7 @@ const BrowsePage = () => {
         <Breadcrumbs items={crumbs} />
         <h1 className="mb-6 font-display text-2xl font-bold">{title}</h1>
         {items.length === 0 ? (
-          <p className="text-muted-foreground">No data found. Add some from the Admin panel.</p>
+          <p className="text-muted-foreground">{t("কোন ডেটা পাওয়া যায়নি। অ্যাডমিন প্যানেল থেকে যোগ করুন।", "No data found. Add some from the Admin panel.")}</p>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (

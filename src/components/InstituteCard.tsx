@@ -1,6 +1,6 @@
 import { GraduationCap, Phone, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 
 interface InstituteCardProps {
@@ -18,33 +18,36 @@ const typeColors: Record<string, string> = {
   Mosque: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20",
 };
 
-const InstituteCard = ({ id, name, type, address, phone }: InstituteCardProps) => (
-  <div className="rounded-xl border bg-card p-5 card-elevated">
-    <div className="mb-3 flex items-start justify-between">
-      <div className="flex items-center gap-2">
-        <GraduationCap className="h-5 w-5 text-primary" />
-        <h3 className="font-display font-semibold text-card-foreground">{name}</h3>
+const InstituteCard = ({ id, name, type, address, phone }: InstituteCardProps) => {
+  const { t } = useLanguage();
+  return (
+    <div className="rounded-xl border bg-card p-5 card-elevated">
+      <div className="mb-3 flex items-start justify-between">
+        <div className="flex items-center gap-2">
+          <GraduationCap className="h-5 w-5 text-primary" />
+          <h3 className="font-display font-semibold text-card-foreground">{name}</h3>
+        </div>
+        <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium ${typeColors[type] || ""}`}>
+          {type}
+        </span>
       </div>
-      <span className={`inline-flex rounded-full border px-2.5 py-0.5 text-xs font-medium ${typeColors[type] || ""}`}>
-        {type}
-      </span>
+      {address && (
+        <p className="mb-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <MapPin className="h-3.5 w-3.5" /> {address}
+        </p>
+      )}
+      {phone && (
+        <p className="mb-3 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <Phone className="h-3.5 w-3.5" /> {phone}
+        </p>
+      )}
+      <Link to={`/institutes/${id}`}>
+        <Button size="sm" variant="outline" className="w-full">
+          {t("বিস্তারিত দেখুন", "View Details")}
+        </Button>
+      </Link>
     </div>
-    {address && (
-      <p className="mb-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-        <MapPin className="h-3.5 w-3.5" /> {address}
-      </p>
-    )}
-    {phone && (
-      <p className="mb-3 flex items-center gap-1.5 text-sm text-muted-foreground">
-        <Phone className="h-3.5 w-3.5" /> {phone}
-      </p>
-    )}
-    <Link to={`/institutes/${id}`}>
-      <Button size="sm" variant="outline" className="w-full">
-        View Details
-      </Button>
-    </Link>
-  </div>
-);
+  );
+};
 
 export default InstituteCard;

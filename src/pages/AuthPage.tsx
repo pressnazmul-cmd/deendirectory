@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ const AuthPage = () => {
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,18 +29,17 @@ const AuthPage = () => {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success("সফলভাবে লগইন হয়েছে!");
+        toast.success(t("সফলভাবে লগইন হয়েছে!", "Signed in successfully!"));
         navigate("/");
       }
     } else {
-      // Find user by mobile number
       const { data: profileData } = await supabase.from("profiles").select("id").eq("mobile", emailOrPhone).single();
       if (!profileData) {
-        toast.error("এই মোবাইল নম্বর দিয়ে কোন অ্যাকাউন্ট পাওয়া যায়নি");
+        toast.error(t("এই মোবাইল নম্বর দিয়ে কোন অ্যাকাউন্ট পাওয়া যায়নি", "No account found with this mobile number"));
         setLoading(false);
         return;
       }
-      toast.error("মোবাইল নম্বর দিয়ে লগইন করতে আপনার ইমেইল ব্যবহার করুন");
+      toast.error(t("মোবাইল নম্বর দিয়ে লগইন করতে আপনার ইমেইল ব্যবহার করুন", "Please use your email to sign in"));
       setLoading(false);
     }
   };
@@ -50,23 +51,23 @@ const AuthPage = () => {
         <div className="mx-auto max-w-md">
           <form onSubmit={handleSignIn} className="space-y-4 rounded-xl border bg-card p-6">
             <h2 className="flex items-center gap-2 font-display text-xl font-bold">
-              <LogIn className="h-5 w-5" /> Sign In
+              <LogIn className="h-5 w-5" /> {t("সাইন ইন", "Sign In")}
             </h2>
             <div>
-              <Label>Email বা মোবাইল নম্বর</Label>
+              <Label>{t("Email বা মোবাইল নম্বর", "Email or Mobile Number")}</Label>
               <Input
                 value={emailOrPhone}
                 onChange={(e) => setEmailOrPhone(e.target.value)}
                 required
-                placeholder="email@example.com বা 01XXXXXXXXX"
+                placeholder={t("email@example.com বা 01XXXXXXXXX", "email@example.com or 01XXXXXXXXX")}
               />
             </div>
             <div>
-              <Label>Password</Label>
+              <Label>{t("পাসওয়ার্ড", "Password")}</Label>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Loading..." : "Sign In"}
+              {loading ? t("লোড হচ্ছে...", "Loading...") : t("সাইন ইন", "Sign In")}
             </Button>
           </form>
         </div>

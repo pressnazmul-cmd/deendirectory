@@ -5,11 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-
-// Animated counter hook
 const useAnimatedCount = (target: number, duration = 1500) => {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
@@ -37,7 +36,6 @@ const useAnimatedCount = (target: number, duration = 1500) => {
     return () => observer.disconnect();
   }, [target, duration]);
 
-  // Reset on page reload
   useEffect(() => {
     animated.current = false;
     setCount(0);
@@ -63,8 +61,8 @@ const StatCard = ({ icon: Icon, label, value, delay }: { icon: any; label: strin
 
 const Index = () => {
   const [search, setSearch] = useState("");
+  const { t } = useLanguage();
 
-  // Search across institutes + all location levels
   const { data: searchResults } = useQuery({
     queryKey: ["global-search", search],
     queryFn: async () => {
@@ -106,7 +104,6 @@ const Index = () => {
     enabled: search.trim().length > 1,
   });
 
-  // All counts
   const { data: stats } = useQuery({
     queryKey: ["all-stats"],
     queryFn: async () => {
@@ -151,14 +148,20 @@ const Index = () => {
             deendirectory
           </h1>
           <p className="mx-auto mb-8 max-w-lg text-primary-foreground/80">
-            Find educational institutes across Bangladesh — search by name or browse by location.
+            {t(
+              "বাংলাদেশের শিক্ষা প্রতিষ্ঠান খুঁজুন — নাম দিয়ে সার্চ করুন অথবা লোকেশন ব্রাউজ করুন।",
+              "Find educational institutes across Bangladesh — search by name or browse by location."
+            )}
           </p>
 
           {/* Search */}
           <div className="relative mx-auto max-w-xl">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search institutes, divisions, districts, upazilas..."
+              placeholder={t(
+                "প্রতিষ্ঠান, বিভাগ, জেলা, উপজেলা খুঁজুন...",
+                "Search institutes, divisions, districts, upazilas..."
+              )}
               className="h-12 rounded-xl border-none bg-card pl-10 shadow-lg"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -189,12 +192,12 @@ const Index = () => {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/browse">
               <Button size="lg" variant="secondary" className="gap-2 rounded-xl shadow-md">
-                <MapPin className="h-4 w-4" /> Browse by Location
+                <MapPin className="h-4 w-4" /> {t("লোকেশন ব্রাউজ করুন", "Browse by Location")}
               </Button>
             </Link>
             <Link to="/institutes">
               <Button size="lg" variant="secondary" className="gap-2 rounded-xl shadow-md">
-                <Building2 className="h-4 w-4" /> View All Institutes
+                <Building2 className="h-4 w-4" /> {t("সকল প্রতিষ্ঠান দেখুন", "View All Institutes")}
               </Button>
             </Link>
           </div>
@@ -204,12 +207,12 @@ const Index = () => {
       {/* Stats */}
       <section className="container py-12">
         <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
-          <StatCard icon={Map} label="Divisions" value={stats?.divisions ?? 0} delay={0} />
-          <StatCard icon={Landmark} label="Districts" value={stats?.districts ?? 0} delay={100} />
-          <StatCard icon={MapPin} label="Upazilas" value={stats?.upazilas ?? 0} delay={200} />
-          <StatCard icon={Home} label="Unions" value={stats?.unions ?? 0} delay={300} />
-          <StatCard icon={TreePine} label="Villages" value={stats?.villages ?? 0} delay={400} />
-          <StatCard icon={GraduationCap} label="Institutes" value={stats?.institutes ?? 0} delay={500} />
+          <StatCard icon={Map} label={t("বিভাগ", "Divisions")} value={stats?.divisions ?? 0} delay={0} />
+          <StatCard icon={Landmark} label={t("জেলা", "Districts")} value={stats?.districts ?? 0} delay={100} />
+          <StatCard icon={MapPin} label={t("উপজেলা", "Upazilas")} value={stats?.upazilas ?? 0} delay={200} />
+          <StatCard icon={Home} label={t("ইউনিয়ন", "Unions")} value={stats?.unions ?? 0} delay={300} />
+          <StatCard icon={TreePine} label={t("গ্রাম", "Villages")} value={stats?.villages ?? 0} delay={400} />
+          <StatCard icon={GraduationCap} label={t("প্রতিষ্ঠান", "Institutes")} value={stats?.institutes ?? 0} delay={500} />
         </div>
       </section>
 
