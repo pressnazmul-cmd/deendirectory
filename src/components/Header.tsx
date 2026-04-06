@@ -26,6 +26,7 @@ const Header = () => {
     { to: "/", label: t("হোম", "Home") },
     { to: "/browse", label: t("ব্রাউজ", "Browse") },
     { to: "/institutes", label: t("প্রতিষ্ঠান", "Institutes") },
+    { to: "/stories", label: t("স্টোরি", "Stories") },
     ...(isAdmin ? [{ to: "/admin", label: t("অ্যাডমিন", "Admin") }] : []),
   ];
 

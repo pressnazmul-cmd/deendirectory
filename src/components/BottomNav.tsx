@@ -13,6 +13,7 @@ const BottomNav = () => {
     { to: "/", icon: Home, label: t("হোম", "Home") },
     { to: "/browse", icon: MapPin, label: t("ব্রাউজ", "Browse") },
     { to: "/institutes", icon: Building2, label: t("প্রতিষ্ঠান", "Institutes") },
+    { to: "/stories", icon: BookOpen, label: t("স্টোরি", "Stories") },
     ...(isAdmin ? [{ to: "/admin", icon: Shield, label: t("অ্যাডমিন", "Admin") }] : []),
     ...(user
       ? [{ to: "/profile", icon: User, label: t("প্রোফাইল", "Profile") }]

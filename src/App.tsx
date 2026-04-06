@@ -38,6 +38,7 @@ const App = () => (
                   <Route path="/browse/:divisionId/:districtId/:upazilaId/:unionId" element={<BrowsePage />} />
                   <Route path="/institutes" element={<InstitutesPage />} />
                   <Route path="/institutes/:id" element={<InstituteDetailsPage />} />
+                  <Route path="/stories" element={<StoriesPage />} />
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/profile" element={<ProfilePage />} />
