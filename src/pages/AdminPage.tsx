@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RoleManagement from "@/components/RoleManagement";
 import PrayerTimeManager from "@/components/PrayerTimeManager";
+import StoryManager from "@/components/StoryManager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -244,6 +245,7 @@ const AdminPage = () => {
             <TabsTrigger value="villages">Villages</TabsTrigger>
             <TabsTrigger value="institutes">Institutes</TabsTrigger>
             <TabsTrigger value="prayer-times">Prayer Times</TabsTrigger>
+            {userRole === "super_admin" && <TabsTrigger value="stories">Stories</TabsTrigger>}
             {userRole === "super_admin" && <TabsTrigger value="roles">User Roles</TabsTrigger>}
           </TabsList>
 
@@ -371,6 +373,12 @@ const AdminPage = () => {
           <TabsContent value="prayer-times">
             <PrayerTimeManager />
           </TabsContent>
+
+          {userRole === "super_admin" && (
+            <TabsContent value="stories">
+              <StoryManager />
+            </TabsContent>
+          )}
 
           {userRole === "super_admin" && (
             <TabsContent value="roles">

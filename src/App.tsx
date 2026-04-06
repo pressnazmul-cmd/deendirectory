@@ -14,6 +14,7 @@ import InstituteDetailsPage from "./pages/InstituteDetailsPage";
 import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
+import StoriesPage from "./pages/StoriesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
                   <Route path="/browse/:divisionId/:districtId/:upazilaId/:unionId" element={<BrowsePage />} />
                   <Route path="/institutes" element={<InstitutesPage />} />
                   <Route path="/institutes/:id" element={<InstituteDetailsPage />} />
+                  <Route path="/stories" element={<StoriesPage />} />
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/profile" element={<ProfilePage />} />
