@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, MapPin, Building2, User, Shield } from "lucide-react";
+import { Home, MapPin, Building2, User, Shield, BookOpen } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 
