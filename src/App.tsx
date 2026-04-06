@@ -14,6 +14,7 @@ import InstituteDetailsPage from "./pages/InstituteDetailsPage";
 import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
+import StoriesPage from "./pages/StoriesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
