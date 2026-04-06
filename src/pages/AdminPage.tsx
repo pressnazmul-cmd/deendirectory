@@ -375,6 +375,12 @@ const AdminPage = () => {
           </TabsContent>
 
           {userRole === "super_admin" && (
+            <TabsContent value="stories">
+              <StoryManager />
+            </TabsContent>
+          )}
+
+          {userRole === "super_admin" && (
             <TabsContent value="roles">
               <RoleManagement />
             </TabsContent>
