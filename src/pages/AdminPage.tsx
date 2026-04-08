@@ -15,7 +15,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Trash2, Pencil, Plus, LayoutDashboard, MapPin, Building, Map, TreePine, Home, Clock, BookOpen, Shield } from "lucide-react";
 
-type Tab = "divisions" | "districts" | "upazilas" | "unions" | "villages" | "institutes";
+type Tab = "divisions" | "districts" | "upazilas" | "unions" | "villages" | "institutes" | "prayer-times" | "stories" | "roles";
+
+const menuItems: { value: Tab; label: string; icon: any; superAdminOnly?: boolean }[] = [
+  { value: "divisions", label: "Divisions", icon: LayoutDashboard },
+  { value: "districts", label: "Districts", icon: MapPin },
+  { value: "upazilas", label: "Upazilas", icon: Map },
+  { value: "unions", label: "Unions", icon: TreePine },
+  { value: "villages", label: "Villages", icon: Home },
+  { value: "institutes", label: "Institutes", icon: Building },
+  { value: "prayer-times", label: "Prayer Times", icon: Clock },
+  { value: "stories", label: "Stories", icon: BookOpen, superAdminOnly: true },
+  { value: "roles", label: "User Roles", icon: Shield, superAdminOnly: true },
+];
 
 const AdminPage = () => {
   const { user, userRole, loading } = useAuth();
