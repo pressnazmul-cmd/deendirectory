@@ -57,6 +57,18 @@ const StoryManager = () => {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const deleteStory = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("stories").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(t("মুছে ফেলা হয়েছে", "Deleted"));
+      qc.invalidateQueries({ queryKey: ["admin-stories"] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   const statusColor = (s: string) => {
     if (s === "pending") return "text-yellow-600 border-yellow-300";
     if (s === "approved") return "text-green-600 border-green-300";
