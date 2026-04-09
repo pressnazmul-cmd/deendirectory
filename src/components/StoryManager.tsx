@@ -21,10 +21,18 @@ const StoryManager = () => {
   const [adminNote, setAdminNote] = useState("");
   const [filter, setFilter] = useState<"pending" | "approved" | "rejected" | "all">("pending");
 
+  const { data: categories } = useQuery({
+    queryKey: ["story-categories"],
+    queryFn: async () => {
+      const { data } = await supabase.from("story_categories").select("*").order("name");
+      return data || [];
+    },
+  });
+
   const { data: stories } = useQuery({
     queryKey: ["admin-stories", filter],
     queryFn: async () => {
-      let q = supabase.from("stories").select("*, profiles:user_id(full_name, mobile)").order("created_at", { ascending: false });
+      let q = supabase.from("stories").select("*, profiles:user_id(full_name, mobile), story_categories:category_id(name)").order("created_at", { ascending: false });
       if (filter !== "all") q = q.eq("status", filter);
       const { data } = await q;
       return data || [];
