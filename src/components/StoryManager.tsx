@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Pencil, Clock, Save } from "lucide-react";
+import { CheckCircle, XCircle, Pencil, Clock, Save, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 const StoryManager = () => {
