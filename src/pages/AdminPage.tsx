@@ -25,6 +25,7 @@ const menuItems: { value: Tab; label: string; icon: any; superAdminOnly?: boolea
   { value: "villages", label: "Villages", icon: Home },
   { value: "institutes", label: "Institutes", icon: Building },
   { value: "prayer-times", label: "Prayer Times", icon: Clock },
+  { value: "story-categories", label: "Story Categories", icon: Tag, superAdminOnly: true },
   { value: "stories", label: "Stories", icon: BookOpen, superAdminOnly: true },
   { value: "roles", label: "User Roles", icon: Shield, superAdminOnly: true },
 ];
