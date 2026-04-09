@@ -91,6 +91,7 @@ const StoryManager = () => {
             </div>
             <p className="text-xs text-muted-foreground">
               {(story.profiles as any)?.full_name} • {(story.profiles as any)?.mobile} • {format(new Date(story.created_at), "dd MMM yyyy")}
+              {(story.story_categories as any)?.name && <> • <Badge variant="secondary" className="text-xs ml-1">{(story.story_categories as any).name}</Badge></>}
             </p>
           </CardHeader>
           <CardContent>
