@@ -142,6 +142,9 @@ const StoryManager = () => {
                 <Button size="sm" variant="outline" className="gap-1" onClick={() => { setEditId(story.id); setEditTitle(story.title); setEditContent(story.content); setAdminNote(story.admin_note || ""); }}>
                   <Pencil className="h-3 w-3" />{t("সম্পাদনা", "Edit")}
                 </Button>
+                <Button size="sm" variant="outline" className="gap-1 text-destructive" onClick={() => { if (window.confirm(t("আপনি কি নিশ্চিত?", "Are you sure?"))) deleteStory.mutate(story.id); }}>
+                  <Trash2 className="h-3 w-3" />{t("মুছুন", "Delete")}
+                </Button>
               </>
             )}
           </CardFooter>
