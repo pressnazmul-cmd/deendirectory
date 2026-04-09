@@ -159,24 +159,49 @@ const StoriesPage = () => {
 };
 
 const StoryList = ({ stories, isLoading, t }: { stories: any[]; isLoading: boolean; t: (bn: string, en: string) => string }) => {
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
   if (isLoading) return <p className="text-center text-muted-foreground py-8">{t("লোড হচ্ছে...", "Loading...")}</p>;
   if (!stories.length) return <p className="text-center text-muted-foreground py-8">{t("কোনো স্টোরি পাওয়া যায়নি", "No stories found")}</p>;
 
+  const toggleExpand = (id: string) => {
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const truncate = (text: string, wordLimit: number) => {
+    const words = text.split(/\s+/);
+    if (words.length <= wordLimit) return { text, truncated: false };
+    return { text: words.slice(0, wordLimit).join(" ") + "...", truncated: true };
+  };
+
   return (
     <div className="grid gap-4">
-      {stories.map((story) => (
-        <Card key={story.id}>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">{story.title}</CardTitle>
-            <p className="text-xs text-muted-foreground">
-              {t("লেখক: ", "By: ")}{(story.profiles as any)?.full_name || t("অজানা", "Unknown")} • {format(new Date(story.created_at), "dd MMM yyyy")}
-            </p>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm whitespace-pre-wrap">{story.content}</p>
-          </CardContent>
-        </Card>
-      ))}
+      {stories.map((story) => {
+        const isExpanded = expandedIds.has(story.id);
+        const { text: displayText, truncated } = truncate(story.content, 200);
+        return (
+          <Card key={story.id}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">{story.title}</CardTitle>
+              <p className="text-xs text-muted-foreground">
+                {t("লেখক: ", "By: ")}{(story.profiles as any)?.full_name || t("অজানা", "Unknown")} • {format(new Date(story.created_at), "dd MMM yyyy")}
+              </p>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm whitespace-pre-wrap">{isExpanded ? story.content : displayText}</p>
+              {truncated && (
+                <Button variant="link" size="sm" className="p-0 h-auto mt-1 text-primary" onClick={() => toggleExpand(story.id)}>
+                  {isExpanded ? t("সংক্ষেপে দেখুন", "Show Less") : t("আরও পড়ুন", "Read More")}
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 };
