@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Pencil, Clock, Save } from "lucide-react";
+import { CheckCircle, XCircle, Pencil, Clock, Save, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 const StoryManager = () => {
@@ -53,6 +53,18 @@ const StoryManager = () => {
       toast.success(t("আপডেট হয়েছে", "Updated"));
       qc.invalidateQueries({ queryKey: ["admin-stories"] });
       setEditId(null);
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
+  const deleteStory = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("stories").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success(t("মুছে ফেলা হয়েছে", "Deleted"));
+      qc.invalidateQueries({ queryKey: ["admin-stories"] });
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -129,6 +141,9 @@ const StoryManager = () => {
                 )}
                 <Button size="sm" variant="outline" className="gap-1" onClick={() => { setEditId(story.id); setEditTitle(story.title); setEditContent(story.content); setAdminNote(story.admin_note || ""); }}>
                   <Pencil className="h-3 w-3" />{t("সম্পাদনা", "Edit")}
+                </Button>
+                <Button size="sm" variant="outline" className="gap-1 text-destructive" onClick={() => { if (window.confirm(t("আপনি কি নিশ্চিত?", "Are you sure?"))) deleteStory.mutate(story.id); }}>
+                  <Trash2 className="h-3 w-3" />{t("মুছুন", "Delete")}
                 </Button>
               </>
             )}
