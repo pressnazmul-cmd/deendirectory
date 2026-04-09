@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Trash2, Pencil, Plus, LayoutDashboard, MapPin, Building, Map, TreePine, Home, Clock, BookOpen, Shield, Tag } from "lucide-react";
 
-type Tab = "divisions" | "districts" | "upazilas" | "unions" | "villages" | "institutes" | "prayer-times" | "stories" | "roles";
+type Tab = "divisions" | "districts" | "upazilas" | "unions" | "villages" | "institutes" | "prayer-times" | "story-categories" | "stories" | "roles";
 
 const menuItems: { value: Tab; label: string; icon: any; superAdminOnly?: boolean }[] = [
   { value: "divisions", label: "Divisions", icon: LayoutDashboard },
