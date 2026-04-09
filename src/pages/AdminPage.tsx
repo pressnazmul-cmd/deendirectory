@@ -8,13 +8,14 @@ import Footer from "@/components/Footer";
 import RoleManagement from "@/components/RoleManagement";
 import PrayerTimeManager from "@/components/PrayerTimeManager";
 import StoryManager from "@/components/StoryManager";
+import StoryCategoryManager from "@/components/StoryCategoryManager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Trash2, Pencil, Plus, LayoutDashboard, MapPin, Building, Map, TreePine, Home, Clock, BookOpen, Shield } from "lucide-react";
+import { Trash2, Pencil, Plus, LayoutDashboard, MapPin, Building, Map, TreePine, Home, Clock, BookOpen, Shield, Tag } from "lucide-react";
 
-type Tab = "divisions" | "districts" | "upazilas" | "unions" | "villages" | "institutes" | "prayer-times" | "stories" | "roles";
+type Tab = "divisions" | "districts" | "upazilas" | "unions" | "villages" | "institutes" | "prayer-times" | "story-categories" | "stories" | "roles";
 
 const menuItems: { value: Tab; label: string; icon: any; superAdminOnly?: boolean }[] = [
   { value: "divisions", label: "Divisions", icon: LayoutDashboard },
@@ -24,6 +25,7 @@ const menuItems: { value: Tab; label: string; icon: any; superAdminOnly?: boolea
   { value: "villages", label: "Villages", icon: Home },
   { value: "institutes", label: "Institutes", icon: Building },
   { value: "prayer-times", label: "Prayer Times", icon: Clock },
+  { value: "story-categories", label: "Story Categories", icon: Tag, superAdminOnly: true },
   { value: "stories", label: "Stories", icon: BookOpen, superAdminOnly: true },
   { value: "roles", label: "User Roles", icon: Shield, superAdminOnly: true },
 ];
@@ -419,6 +421,8 @@ const AdminPage = () => {
             )}
 
             {activeTab === "prayer-times" && <PrayerTimeManager />}
+
+            {activeTab === "story-categories" && userRole === "super_admin" && <StoryCategoryManager />}
 
             {activeTab === "stories" && userRole === "super_admin" && <StoryManager />}
 

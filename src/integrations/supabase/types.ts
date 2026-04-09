@@ -206,6 +206,7 @@ export type Database = {
       stories: {
         Row: {
           admin_note: string | null
+          category_id: string | null
           content: string
           created_at: string
           id: string
@@ -216,6 +217,7 @@ export type Database = {
         }
         Insert: {
           admin_note?: string | null
+          category_id?: string | null
           content: string
           created_at?: string
           id?: string
@@ -226,6 +228,7 @@ export type Database = {
         }
         Update: {
           admin_note?: string | null
+          category_id?: string | null
           content?: string
           created_at?: string
           id?: string
@@ -236,6 +239,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "stories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "story_categories"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "stories_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -243,6 +253,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      story_categories: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
       }
       unions: {
         Row: {

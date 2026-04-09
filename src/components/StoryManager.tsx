@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -20,10 +21,18 @@ const StoryManager = () => {
   const [adminNote, setAdminNote] = useState("");
   const [filter, setFilter] = useState<"pending" | "approved" | "rejected" | "all">("pending");
 
+  const { data: categories } = useQuery({
+    queryKey: ["story-categories"],
+    queryFn: async () => {
+      const { data } = await supabase.from("story_categories").select("*").order("name");
+      return data || [];
+    },
+  });
+
   const { data: stories } = useQuery({
     queryKey: ["admin-stories", filter],
     queryFn: async () => {
-      let q = supabase.from("stories").select("*, profiles:user_id(full_name, mobile)").order("created_at", { ascending: false });
+      let q = supabase.from("stories").select("*, profiles:user_id(full_name, mobile), story_categories:category_id(name)").order("created_at", { ascending: false });
       if (filter !== "all") q = q.eq("status", filter);
       const { data } = await q;
       return data || [];
@@ -82,6 +91,7 @@ const StoryManager = () => {
             </div>
             <p className="text-xs text-muted-foreground">
               {(story.profiles as any)?.full_name} • {(story.profiles as any)?.mobile} • {format(new Date(story.created_at), "dd MMM yyyy")}
+              {(story.story_categories as any)?.name && <> • <Badge variant="secondary" className="text-xs ml-1">{(story.story_categories as any).name}</Badge></>}
             </p>
           </CardHeader>
           <CardContent>
