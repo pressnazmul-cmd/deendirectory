@@ -182,7 +182,7 @@ const StoryList = ({ stories, isLoading, t }: { stories: any[]; isLoading: boole
     <div className="grid gap-4">
       {stories.map((story) => {
         const isExpanded = expandedIds.has(story.id);
-        const { text: displayText, truncated } = truncate(story.content, 200);
+        const { text: displayText, truncated } = truncate(story.content, 25);
         return (
           <Card key={story.id}>
             <CardHeader className="pb-2">
