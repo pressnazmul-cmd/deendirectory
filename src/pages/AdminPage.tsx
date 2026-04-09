@@ -422,6 +422,8 @@ const AdminPage = () => {
 
             {activeTab === "prayer-times" && <PrayerTimeManager />}
 
+            {activeTab === "story-categories" && userRole === "super_admin" && <StoryCategoryManager />}
+
             {activeTab === "stories" && userRole === "super_admin" && <StoryManager />}
 
             {activeTab === "roles" && userRole === "super_admin" && <RoleManagement />}
