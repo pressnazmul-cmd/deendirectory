@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { PenLine, Send, Clock, CheckCircle, XCircle, LogIn } from "lucide-react";
@@ -23,17 +24,32 @@ const StoriesPage = () => {
   const qc = useQueryClient();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
-  // Fetch approved stories (public)
-  const { data: approvedStories, isLoading } = useQuery({
-    queryKey: ["stories-approved"],
+  // Fetch categories
+  const { data: categories } = useQuery({
+    queryKey: ["story-categories"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data } = await supabase.from("story_categories").select("*").order("name");
+      return data || [];
+    },
+  });
+
+  // Fetch approved stories
+  const { data: approvedStories, isLoading } = useQuery({
+    queryKey: ["stories-approved", selectedCategory],
+    queryFn: async () => {
+      let q = supabase
         .from("stories")
-        .select("*, profiles:user_id(full_name, avatar_url)")
+        .select("*, profiles:user_id(full_name, avatar_url), story_categories:category_id(name)")
         .eq("status", "approved")
         .order("created_at", { ascending: false });
+      if (selectedCategory !== "all") {
+        q = q.eq("category_id", selectedCategory);
+      }
+      const { data } = await q;
       return data || [];
     },
   });
@@ -45,7 +61,7 @@ const StoriesPage = () => {
     queryFn: async () => {
       const { data } = await supabase
         .from("stories")
-        .select("*")
+        .select("*, story_categories:category_id(name)")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       return data || [];
@@ -55,17 +71,20 @@ const StoriesPage = () => {
   const submitStory = useMutation({
     mutationFn: async () => {
       if (!title.trim() || !content.trim()) throw new Error("Title and content required");
-      const { error } = await supabase.from("stories").insert({
+      const payload: any = {
         user_id: user!.id,
         title: title.trim(),
         content: content.trim(),
-      });
+      };
+      if (categoryId) payload.category_id = categoryId;
+      const { error } = await supabase.from("stories").insert(payload);
       if (error) throw error;
     },
     onSuccess: () => {
       toast.success(t("স্টোরি সাবমিট হয়েছে! অনুমোদনের জন্য অপেক্ষা করুন।", "Story submitted! Waiting for approval."));
       setTitle("");
       setContent("");
+      setCategoryId("");
       setDialogOpen(false);
       qc.invalidateQueries({ queryKey: ["stories-mine"] });
     },
@@ -82,7 +101,7 @@ const StoriesPage = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-6 max-w-4xl">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">{t("স্টোরি", "Stories")}</h1>
           {user ? (
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -95,6 +114,14 @@ const StoriesPage = () => {
                 </DialogHeader>
                 <div className="space-y-4">
                   <Input placeholder={t("শিরোনাম", "Title")} value={title} onChange={(e) => setTitle(e.target.value)} />
+                  <Select value={categoryId} onValueChange={setCategoryId}>
+                    <SelectTrigger><SelectValue placeholder={t("বিভাগ নির্বাচন করুন", "Select Category")} /></SelectTrigger>
+                    <SelectContent>
+                      {categories?.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Textarea placeholder={t("আপনার স্টোরি লিখুন...", "Write your story...")} value={content} onChange={(e) => setContent(e.target.value)} rows={8} />
                   <Button onClick={() => submitStory.mutate()} disabled={submitStory.isPending} className="w-full gap-2">
                     <Send className="h-4 w-4" />{t("সেন্ড করুন", "Submit")}
@@ -110,6 +137,27 @@ const StoriesPage = () => {
               <Button variant="outline" className="gap-2"><LogIn className="h-4 w-4" />{t("লগইন করে স্টোরি লিখুন", "Login to Write")}</Button>
             </Link>
           )}
+        </div>
+
+        {/* Category filter */}
+        <div className="flex gap-2 flex-wrap mb-6">
+          <Button
+            variant={selectedCategory === "all" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setSelectedCategory("all")}
+          >
+            {t("সব", "All")}
+          </Button>
+          {categories?.map((cat) => (
+            <Button
+              key={cat.id}
+              variant={selectedCategory === cat.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(cat.id)}
+            >
+              {cat.name}
+            </Button>
+          ))}
         </div>
 
         {user && myStories && myStories.length > 0 && (
@@ -130,6 +178,9 @@ const StoriesPage = () => {
                         <CardTitle className="text-lg">{story.title}</CardTitle>
                         {statusBadge(story.status)}
                       </div>
+                      {(story.story_categories as any)?.name && (
+                        <Badge variant="secondary" className="w-fit">{(story.story_categories as any).name}</Badge>
+                      )}
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground whitespace-pre-wrap">{story.content}</p>
@@ -187,9 +238,14 @@ const StoryList = ({ stories, isLoading, t }: { stories: any[]; isLoading: boole
           <Card key={story.id}>
             <CardHeader className="pb-2">
               <CardTitle className="text-lg">{story.title}</CardTitle>
-              <p className="text-xs text-muted-foreground">
-                {t("লেখক: ", "By: ")}{(story.profiles as any)?.full_name || t("অজানা", "Unknown")} • {format(new Date(story.created_at), "dd MMM yyyy")}
-              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-xs text-muted-foreground">
+                  {t("লেখক: ", "By: ")}{(story.profiles as any)?.full_name || t("অজানা", "Unknown")} • {format(new Date(story.created_at), "dd MMM yyyy")}
+                </p>
+                {(story.story_categories as any)?.name && (
+                  <Badge variant="secondary" className="text-xs">{(story.story_categories as any).name}</Badge>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               <p className="text-sm whitespace-pre-wrap">{isExpanded ? story.content : displayText}</p>
