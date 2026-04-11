@@ -247,12 +247,12 @@ const StoryList = ({ stories, isLoading, t }: { stories: any[]; isLoading: boole
                 )}
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent onClick={() => truncated && toggleExpand(story.id)} className={truncated ? "cursor-pointer" : ""}>
               <p className="text-sm whitespace-pre-wrap">{isExpanded ? story.content : displayText}</p>
               {truncated && (
-                <Button variant="link" size="sm" className="p-0 h-auto mt-1 text-primary" onClick={() => toggleExpand(story.id)}>
+                <span className="text-sm text-primary mt-1 inline-block">
                   {isExpanded ? t("সংক্ষেপে দেখুন", "Show Less") : t("আরও পড়ুন", "Read More")}
-                </Button>
+                </span>
               )}
             </CardContent>
           </Card>
