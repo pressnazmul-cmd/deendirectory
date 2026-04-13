@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { Heart, MessageCircle, Share2, Send, Trash2 } from "lucide-react";
+import { ThumbsUp, MessageCircle, Share2, Send, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 interface StoryInteractionsProps {
@@ -142,7 +142,7 @@ const StoryInteractions = ({ storyId, storyTitle }: StoryInteractionsProps) => {
           onClick={() => user ? toggleLike.mutate() : toast.error(t("লগইন করুন", "Please login"))}
           disabled={toggleLike.isPending}
         >
-          <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
+          <ThumbsUp className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
           {likeCount > 0 && <span className="text-xs">{likeCount}</span>}
         </Button>
 
