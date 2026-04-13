@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
-import { Heart, MessageCircle, Share2, Send, Trash2 } from "lucide-react";
+import { ThumbsUp, MessageCircle, Share2, Send, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 
 interface StoryInteractionsProps {
