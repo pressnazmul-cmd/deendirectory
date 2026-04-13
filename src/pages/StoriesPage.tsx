@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { PenLine, Send, Clock, CheckCircle, XCircle, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import StoryInteractions from "@/components/StoryInteractions";
 
 const StoriesPage = () => {
   const { user } = useAuth();
