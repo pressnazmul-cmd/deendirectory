@@ -142,7 +142,7 @@ const StoryInteractions = ({ storyId, storyTitle }: StoryInteractionsProps) => {
           onClick={() => user ? toggleLike.mutate() : toast.error(t("লগইন করুন", "Please login"))}
           disabled={toggleLike.isPending}
         >
-          <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
+          <ThumbsUp className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
           {likeCount > 0 && <span className="text-xs">{likeCount}</span>}
         </Button>
 
