@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { PenLine, Send, Clock, CheckCircle, XCircle, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import StoryInteractions from "@/components/StoryInteractions";
 
 const StoriesPage = () => {
   const { user } = useAuth();
@@ -256,13 +257,16 @@ const StoryList = ({ stories, isLoading, t }: { stories: any[]; isLoading: boole
                 )}
               </div>
             </CardHeader>
-            <CardContent onClick={() => truncated && toggleExpand(story.id)} className={truncated ? "cursor-pointer" : ""}>
-              <p className="text-sm whitespace-pre-wrap">{isExpanded ? story.content : displayText}</p>
-              {truncated && (
-                <span className="text-sm text-primary mt-1 inline-block">
-                  {isExpanded ? t("সংক্ষেপে দেখুন", "Show Less") : t("আরও পড়ুন", "Read More")}
-                </span>
-              )}
+            <CardContent>
+              <div onClick={() => truncated && toggleExpand(story.id)} className={truncated ? "cursor-pointer" : ""}>
+                <p className="text-sm whitespace-pre-wrap">{isExpanded ? story.content : displayText}</p>
+                {truncated && (
+                  <span className="text-sm text-primary mt-1 inline-block">
+                    {isExpanded ? t("সংক্ষেপে দেখুন", "Show Less") : t("আরও পড়ুন", "Read More")}
+                  </span>
+                )}
+              </div>
+              <StoryInteractions storyId={story.id} storyTitle={story.title} />
             </CardContent>
           </Card>
         );
