@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import AdSlot from "@/components/AdSlot";
 
 const useAnimatedCount = (target: number, duration = 1500) => {
   const [count, setCount] = useState(0);
@@ -214,6 +215,11 @@ const Index = () => {
           <StatCard icon={TreePine} label={t("গ্রাম", "Villages")} value={stats?.villages ?? 0} delay={400} />
           <StatCard icon={GraduationCap} label={t("প্রতিষ্ঠান", "Institutes")} value={stats?.institutes ?? 0} delay={500} />
         </div>
+      </section>
+
+      {/* Ads */}
+      <section className="container pb-8">
+        <AdSlot placement="homepage" type="banner" />
       </section>
 
       <div className="flex-1" />

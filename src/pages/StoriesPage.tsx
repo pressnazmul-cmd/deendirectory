@@ -19,6 +19,7 @@ import { PenLine, Send, Clock, CheckCircle, XCircle, LogIn } from "lucide-react"
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import StoryInteractions from "@/components/StoryInteractions";
+import AdSlot from "@/components/AdSlot";
 
 const StoriesPage = () => {
   const { user } = useAuth();
@@ -233,42 +234,47 @@ const StoryList = ({ stories, isLoading, t }: { stories: any[]; isLoading: boole
 
   return (
     <div className="grid gap-4">
-      {stories.map((story) => {
+      {stories.map((story, idx) => {
         const isExpanded = expandedIds.has(story.id);
         const { text: displayText, truncated } = truncate(story.content, 25);
         return (
-          <Card key={story.id}>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">{story.title}</CardTitle>
-              <div className="flex items-center gap-2 flex-wrap">
-                <Avatar className="h-6 w-6">
-                  {(story.profiles as any)?.avatar_url ? (
-                    <AvatarImage src={(story.profiles as any).avatar_url} alt={(story.profiles as any)?.full_name || ""} />
-                  ) : null}
-                  <AvatarFallback className="text-[10px]">
-                    {((story.profiles as any)?.full_name || "?").charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <p className="text-xs text-muted-foreground">
-                  {(story.profiles as any)?.full_name || t("অজানা", "Unknown")} • {format(new Date(story.created_at), "dd MMM yyyy")}
-                </p>
-                {(story.story_categories as any)?.name && (
-                  <Badge variant="secondary" className="text-xs">{(story.story_categories as any).name}</Badge>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div onClick={() => truncated && toggleExpand(story.id)} className={truncated ? "cursor-pointer" : ""}>
-                <p className="text-sm whitespace-pre-wrap">{isExpanded ? story.content : displayText}</p>
-                {truncated && (
-                  <span className="text-sm text-primary mt-1 inline-block">
-                    {isExpanded ? t("সংক্ষেপে দেখুন", "Show Less") : t("আরও পড়ুন", "Read More")}
-                  </span>
-                )}
-              </div>
-              <StoryInteractions storyId={story.id} storyTitle={story.title} />
-            </CardContent>
-          </Card>
+          <div key={story.id} className="contents">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">{story.title}</CardTitle>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Avatar className="h-6 w-6">
+                    {(story.profiles as any)?.avatar_url ? (
+                      <AvatarImage src={(story.profiles as any).avatar_url} alt={(story.profiles as any)?.full_name || ""} />
+                    ) : null}
+                    <AvatarFallback className="text-[10px]">
+                      {((story.profiles as any)?.full_name || "?").charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <p className="text-xs text-muted-foreground">
+                    {(story.profiles as any)?.full_name || t("অজানা", "Unknown")} • {format(new Date(story.created_at), "dd MMM yyyy")}
+                  </p>
+                  {(story.story_categories as any)?.name && (
+                    <Badge variant="secondary" className="text-xs">{(story.story_categories as any).name}</Badge>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div onClick={() => truncated && toggleExpand(story.id)} className={truncated ? "cursor-pointer" : ""}>
+                  <p className="text-sm whitespace-pre-wrap">{isExpanded ? story.content : displayText}</p>
+                  {truncated && (
+                    <span className="text-sm text-primary mt-1 inline-block">
+                      {isExpanded ? t("সংক্ষেপে দেখুন", "Show Less") : t("আরও পড়ুন", "Read More")}
+                    </span>
+                  )}
+                </div>
+                <StoryInteractions storyId={story.id} storyTitle={story.title} />
+              </CardContent>
+            </Card>
+            {(idx + 1) % 3 === 0 && idx !== stories.length - 1 && (
+              <AdSlot placement="stories" type="banner" />
+            )}
+          </div>
         );
       })}
     </div>
