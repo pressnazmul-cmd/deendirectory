@@ -62,6 +62,65 @@ export type Database = {
         }
         Relationships: []
       }
+      cart_items: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          quantity: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          quantity?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_settings: {
+        Row: {
+          bkash_number: string | null
+          id: number
+          inside_dhaka_fee: number
+          nagad_number: string | null
+          outside_dhaka_fee: number
+          updated_at: string
+        }
+        Insert: {
+          bkash_number?: string | null
+          id?: number
+          inside_dhaka_fee?: number
+          nagad_number?: string | null
+          outside_dhaka_fee?: number
+          updated_at?: string
+        }
+        Update: {
+          bkash_number?: string | null
+          id?: number
+          inside_dhaka_fee?: number
+          nagad_number?: string | null
+          outside_dhaka_fee?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       districts: {
         Row: {
           created_at: string
@@ -149,6 +208,104 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          product_id: string
+          product_name: string
+          product_price: number
+          quantity: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          product_id: string
+          product_name: string
+          product_price: number
+          quantity: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string
+          product_name?: string
+          product_price?: number
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          buyer_id: string
+          buyer_name: string
+          buyer_phone: string
+          created_at: string
+          delivery_address: string
+          delivery_area: string
+          delivery_fee: number
+          id: string
+          notes: string | null
+          payment_method: string
+          payment_status: string
+          seller_id: string
+          status: string
+          subtotal: number
+          total: number
+          transaction_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          buyer_name: string
+          buyer_phone: string
+          created_at?: string
+          delivery_address: string
+          delivery_area?: string
+          delivery_fee?: number
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          payment_status?: string
+          seller_id: string
+          status?: string
+          subtotal?: number
+          total?: number
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          buyer_name?: string
+          buyer_phone?: string
+          created_at?: string
+          delivery_address?: string
+          delivery_area?: string
+          delivery_fee?: number
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          payment_status?: string
+          seller_id?: string
+          status?: string
+          subtotal?: number
+          total?: number
+          transaction_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       prayer_times: {
         Row: {
