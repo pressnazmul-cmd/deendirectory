@@ -16,7 +16,11 @@ import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import StoriesPage from "./pages/StoriesPage";
 import ProductsPage from "./pages/ProductsPage";
+import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrdersPage from "./pages/OrdersPage";
 import NotFound from "./pages/NotFound";
+import { CartProvider } from "@/contexts/CartContext";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +33,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <AuthProvider>
+              <CartProvider>
               <div className="pb-16 md:pb-0">
                 <Routes>
                   <Route path="/" element={<Index />} />
@@ -41,6 +46,9 @@ const App = () => (
                   <Route path="/institutes/:id" element={<InstituteDetailsPage />} />
                   <Route path="/stories" element={<StoriesPage />} />
                   <Route path="/products" element={<ProductsPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/orders" element={<OrdersPage />} />
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/profile" element={<ProfilePage />} />
@@ -48,6 +56,7 @@ const App = () => (
                 </Routes>
               </div>
               <BottomNav />
+              </CartProvider>
             </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
