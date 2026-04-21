@@ -11,14 +11,23 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { MessageCircle, Phone, Plus, Search, ShoppingBag, LogIn } from "lucide-react";
-import { Link } from "react-router-dom";
+import { MessageCircle, Phone, Plus, Search, ShoppingBag, LogIn, ShoppingCart, Zap } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
 
 const ProductsPage = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [manageOpen, setManageOpen] = useState(false);
+
+  const handleBuyNow = async (productId: string) => {
+    if (!user) { navigate("/auth"); return; }
+    await addToCart(productId, 1);
+    navigate("/checkout");
+  };
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products", search],
@@ -94,21 +103,31 @@ const ProductsPage = () => {
                   <p className="text-xs text-muted-foreground mt-2">
                     {t("বিক্রেতা", "Seller")}: {(p.profiles as any)?.full_name || t("অজানা", "Unknown")}
                   </p>
-                  <div className="flex gap-2 mt-3">
-                    {p.whatsapp_number && (
-                      <Button asChild size="sm" className="flex-1 gap-1 bg-[#25D366] hover:bg-[#1ebe5a] text-white">
-                        <a href={waLink(p.whatsapp_number, p.name)} target="_blank" rel="noopener noreferrer">
-                          <MessageCircle className="h-4 w-4" />WhatsApp
-                        </a>
+                  <div className="flex flex-col gap-2 mt-3">
+                    <div className="flex gap-2">
+                      <Button size="sm" className="flex-1 gap-1" onClick={() => handleBuyNow(p.id)} disabled={p.price == null}>
+                        <Zap className="h-4 w-4" />{t("এখনই কিনুন", "Buy Now")}
                       </Button>
-                    )}
-                    {p.phone_number && (
-                      <Button asChild size="sm" variant="outline" className="flex-1 gap-1">
-                        <a href={`tel:${p.phone_number}`}>
-                          <Phone className="h-4 w-4" />{t("কল", "Call")}
-                        </a>
+                      <Button size="sm" variant="outline" className="flex-1 gap-1" onClick={() => user ? addToCart(p.id) : navigate("/auth")} disabled={p.price == null}>
+                        <ShoppingCart className="h-4 w-4" />{t("কার্ট", "Add to Cart")}
                       </Button>
-                    )}
+                    </div>
+                    <div className="flex gap-2">
+                      {p.whatsapp_number && (
+                        <Button asChild size="sm" variant="ghost" className="flex-1 gap-1 text-[#25D366] hover:text-[#1ebe5a] hover:bg-[#25D366]/10">
+                          <a href={waLink(p.whatsapp_number, p.name)} target="_blank" rel="noopener noreferrer">
+                            <MessageCircle className="h-4 w-4" />WhatsApp
+                          </a>
+                        </Button>
+                      )}
+                      {p.phone_number && (
+                        <Button asChild size="sm" variant="ghost" className="flex-1 gap-1">
+                          <a href={`tel:${p.phone_number}`}>
+                            <Phone className="h-4 w-4" />{t("কল", "Call")}
+                          </a>
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>

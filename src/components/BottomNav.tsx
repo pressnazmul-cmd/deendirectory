@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, MapPin, Building2, User, Shield, BookOpen, ShoppingBag } from "lucide-react";
+import { Home, MapPin, Building2, User, Shield, BookOpen, ShoppingBag, ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -7,6 +8,7 @@ const BottomNav = () => {
   const location = useLocation();
   const { user, userRole } = useAuth();
   const { t } = useLanguage();
+  const { itemCount } = useCart();
   const isAdmin = userRole === "super_admin" || userRole === "admin";
 
   const navItems = [
@@ -15,6 +17,7 @@ const BottomNav = () => {
     { to: "/institutes", icon: Building2, label: t("প্রতিষ্ঠান", "Institutes") },
     { to: "/stories", icon: BookOpen, label: t("স্টোরি", "Stories") },
     { to: "/products", icon: ShoppingBag, label: t("পণ্য", "Products") },
+    { to: "/cart", icon: ShoppingCart, label: t("কার্ট", "Cart"), badge: itemCount },
     ...(isAdmin ? [{ to: "/admin", icon: Shield, label: t("অ্যাডমিন", "Admin") }] : []),
     ...(user
       ? [{ to: "/profile", icon: User, label: t("প্রোফাইল", "Profile") }]
@@ -40,11 +43,16 @@ const BottomNav = () => {
               }`}
             >
               <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full transition-all ${
+                className={`relative flex h-8 w-8 items-center justify-center rounded-full transition-all ${
                   active ? "bg-primary/10 scale-110" : ""
                 }`}
               >
                 <item.icon className="h-5 w-5" />
+                {(item as any).badge > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 h-4 min-w-4 rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground flex items-center justify-center">
+                    {(item as any).badge}
+                  </span>
+                )}
               </div>
               <span>{item.label}</span>
             </Link>
