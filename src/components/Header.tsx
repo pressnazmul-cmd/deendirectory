@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { GraduationCap, LogIn, User, LogOut, Moon, Sun, Globe } from "lucide-react";
+import { GraduationCap, LogIn, User, LogOut, Moon, Sun, Globe, ShoppingCart, Package } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ const Header = () => {
   const { user, profile, userRole, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
   const { language, toggleLanguage, t } = useLanguage();
+  const { itemCount } = useCart();
 
   const isAdmin = userRole === "super_admin" || userRole === "admin";
 
@@ -87,6 +89,18 @@ const Header = () => {
             )}
           </Button>
 
+          {/* Cart */}
+          <Link to="/cart">
+            <Button variant="ghost" size="icon" className="h-9 w-9 relative" title="Cart">
+              <ShoppingCart className="h-4 w-4" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-4 min-w-4 rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </Button>
+          </Link>
+
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -101,6 +115,9 @@ const Header = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/profile")} className="gap-2">
                   <User className="h-4 w-4" /> {t("প্রোফাইল", "Profile")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/orders")} className="gap-2">
+                  <Package className="h-4 w-4" /> {t("আমার অর্ডার", "My Orders")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={signOut} className="gap-2 text-destructive">
                   <LogOut className="h-4 w-4" /> {t("সাইন আউট", "Sign Out")}
