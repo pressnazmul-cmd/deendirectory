@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      advertisements: {
+        Row: {
+          ad_type: string
+          clicks_count: number
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          image_url: string
+          is_active: boolean
+          link_url: string | null
+          placement: string
+          title: string
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          ad_type?: string
+          clicks_count?: number
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean
+          link_url?: string | null
+          placement?: string
+          title: string
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          ad_type?: string
+          clicks_count?: number
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          link_url?: string | null
+          placement?: string
+          title?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: []
+      }
       districts: {
         Row: {
           created_at: string
@@ -142,6 +190,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      products: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          name: string
+          phone_number: string | null
+          price: number | null
+          seller_id: string
+          updated_at: string
+          whatsapp_number: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name: string
+          phone_number?: string | null
+          price?: number | null
+          seller_id: string
+          updated_at?: string
+          whatsapp_number?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          name?: string
+          phone_number?: string | null
+          price?: number | null
+          seller_id?: string
+          updated_at?: string
+          whatsapp_number?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -464,6 +554,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_ad_click: { Args: { _ad_id: string }; Returns: undefined }
+      increment_ad_view: { Args: { _ad_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "super_admin" | "admin" | "editor" | "user"

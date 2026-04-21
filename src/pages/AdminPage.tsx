@@ -9,13 +9,15 @@ import RoleManagement from "@/components/RoleManagement";
 import PrayerTimeManager from "@/components/PrayerTimeManager";
 import StoryManager from "@/components/StoryManager";
 import StoryCategoryManager from "@/components/StoryCategoryManager";
+import AdManager from "@/components/AdManager";
+import ProductManager from "@/components/ProductManager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Trash2, Pencil, Plus, LayoutDashboard, MapPin, Building, Map, TreePine, Home, Clock, BookOpen, Shield, Tag } from "lucide-react";
+import { Trash2, Pencil, Plus, LayoutDashboard, MapPin, Building, Map, TreePine, Home, Clock, BookOpen, Shield, Tag, Megaphone, ShoppingBag } from "lucide-react";
 
-type Tab = "divisions" | "districts" | "upazilas" | "unions" | "villages" | "institutes" | "prayer-times" | "story-categories" | "stories" | "roles";
+type Tab = "divisions" | "districts" | "upazilas" | "unions" | "villages" | "institutes" | "prayer-times" | "story-categories" | "stories" | "roles" | "ads" | "products";
 
 const menuItems: { value: Tab; label: string; icon: any; superAdminOnly?: boolean }[] = [
   { value: "divisions", label: "Divisions", icon: LayoutDashboard },
@@ -25,6 +27,8 @@ const menuItems: { value: Tab; label: string; icon: any; superAdminOnly?: boolea
   { value: "villages", label: "Villages", icon: Home },
   { value: "institutes", label: "Institutes", icon: Building },
   { value: "prayer-times", label: "Prayer Times", icon: Clock },
+  { value: "ads", label: "Advertisements", icon: Megaphone },
+  { value: "products", label: "Products", icon: ShoppingBag },
   { value: "story-categories", label: "Story Categories", icon: Tag, superAdminOnly: true },
   { value: "stories", label: "Stories", icon: BookOpen, superAdminOnly: true },
   { value: "roles", label: "User Roles", icon: Shield, superAdminOnly: true },
@@ -421,6 +425,10 @@ const AdminPage = () => {
             )}
 
             {activeTab === "prayer-times" && <PrayerTimeManager />}
+
+            {activeTab === "ads" && <AdManager />}
+
+            {activeTab === "products" && <ProductManager adminMode />}
 
             {activeTab === "story-categories" && userRole === "super_admin" && <StoryCategoryManager />}
 
