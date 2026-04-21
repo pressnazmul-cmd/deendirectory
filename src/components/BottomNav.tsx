@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, MapPin, Building2, User, Shield, BookOpen } from "lucide-react";
+import { Home, MapPin, Building2, User, Shield, BookOpen, ShoppingBag } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -14,6 +14,7 @@ const BottomNav = () => {
     { to: "/browse", icon: MapPin, label: t("ব্রাউজ", "Browse") },
     { to: "/institutes", icon: Building2, label: t("প্রতিষ্ঠান", "Institutes") },
     { to: "/stories", icon: BookOpen, label: t("স্টোরি", "Stories") },
+    { to: "/products", icon: ShoppingBag, label: t("পণ্য", "Products") },
     ...(isAdmin ? [{ to: "/admin", icon: Shield, label: t("অ্যাডমিন", "Admin") }] : []),
     ...(user
       ? [{ to: "/profile", icon: User, label: t("প্রোফাইল", "Profile") }]
