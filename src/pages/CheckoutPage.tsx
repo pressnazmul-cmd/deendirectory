@@ -84,8 +84,10 @@ const CheckoutPage = () => {
       for (const [sellerId, sellerItems] of sellerGroups) {
         const sub = sellerItems.reduce((s, i) => s + (Number(i.product.price) || 0) * i.quantity, 0);
         const total = sub + deliveryFee;
+        const orderId = crypto.randomUUID();
 
-        const { data: order, error: orderErr } = await supabase.from("orders").insert({
+        const { error: orderErr } = await supabase.from("orders").insert({
+          id: orderId,
           buyer_id: user?.id ?? null,
           seller_id: sellerId,
           buyer_name: name.trim(),
@@ -100,12 +102,12 @@ const CheckoutPage = () => {
           transaction_id: txnId.trim() || null,
           notes: notes.trim() || null,
           status: "pending",
-        }).select().single();
+        });
 
         if (orderErr) throw orderErr;
 
         const orderItemsPayload = sellerItems.map((i) => ({
-          order_id: order.id,
+          order_id: orderId,
           product_id: i.product_id,
           product_name: i.product.name,
           product_price: Number(i.product.price) || 0,
