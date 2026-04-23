@@ -107,7 +107,7 @@ const ProductsPage = () => {
                       <Button size="sm" className="flex-1 gap-1" onClick={() => handleBuyNow(p.id)} disabled={p.price == null}>
                         <Zap className="h-4 w-4" />{t("এখনই কিনুন", "Buy Now")}
                       </Button>
-                      <Button size="sm" variant="outline" className="flex-1 gap-1" onClick={() => user ? addToCart(p.id) : navigate("/auth")} disabled={p.price == null}>
+                      <Button size="sm" variant="outline" className="flex-1 gap-1" onClick={() => addToCart(p.id)} disabled={p.price == null}>
                         <ShoppingCart className="h-4 w-4" />{t("কার্ট", "Add to Cart")}
                       </Button>
                     </div>
