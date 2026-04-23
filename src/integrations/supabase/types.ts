@@ -712,6 +712,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_add_order_items: { Args: { _order_id: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
