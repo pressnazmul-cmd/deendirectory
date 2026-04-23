@@ -71,7 +71,6 @@ const CheckoutPage = () => {
   const grandTotal = subtotal + totalDeliveryFee;
 
   const placeOrder = async () => {
-    if (!user) { toast.error("Please sign in"); return; }
     if (!name.trim() || !phone.trim() || !address.trim()) {
       toast.error(t("সব তথ্য পূরণ করুন", "Please fill all required fields")); return;
     }
@@ -87,7 +86,7 @@ const CheckoutPage = () => {
         const total = sub + deliveryFee;
 
         const { data: order, error: orderErr } = await supabase.from("orders").insert({
-          buyer_id: user.id,
+          buyer_id: user?.id ?? null,
           seller_id: sellerId,
           buyer_name: name.trim(),
           buyer_phone: phone.trim(),
@@ -118,26 +117,13 @@ const CheckoutPage = () => {
 
       await clearCart();
       toast.success(t("অর্ডার সফলভাবে সম্পন্ন হয়েছে!", "Order placed successfully!"));
-      navigate("/orders");
+      navigate(user ? "/orders" : "/products");
     } catch (e: any) {
       toast.error(e.message);
     } finally {
       setSubmitting(false);
     }
   };
-
-  if (!user) {
-    return (
-      <div className="flex min-h-screen flex-col bg-background">
-        <Header />
-        <main className="container flex-1 py-12 text-center">
-          <p className="mb-4">{t("চেকআউট করতে সাইন ইন করুন", "Please sign in to checkout")}</p>
-          <Link to="/auth"><Button>{t("সাইন ইন", "Sign In")}</Button></Link>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   if (items.length === 0) {
     return (

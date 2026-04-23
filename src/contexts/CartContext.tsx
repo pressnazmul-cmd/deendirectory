@@ -34,9 +34,20 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const guestCartKey = "deen_guest_cart";
+
+  const loadGuestCart = useCallback(() => {
+    const saved = localStorage.getItem(guestCartKey);
+    setItems(saved ? JSON.parse(saved) : []);
+  }, []);
+
+  const saveGuestCart = (nextItems: CartItem[]) => {
+    localStorage.setItem(guestCartKey, JSON.stringify(nextItems));
+    setItems(nextItems);
+  };
 
   const refresh = useCallback(async () => {
-    if (!user) { setItems([]); return; }
+    if (!user) { loadGuestCart(); return; }
     setLoading(true);
     const { data, error } = await supabase
       .from("cart_items")
@@ -46,15 +57,26 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     if (error) { console.error(error); setLoading(false); return; }
     setItems((data || []).filter((i: any) => i.product) as any);
     setLoading(false);
-  }, [user]);
+  }, [user, loadGuestCart]);
 
   useEffect(() => { refresh(); }, [refresh]);
 
   const addToCart = async (productId: string, quantity = 1) => {
-    if (!user) { toast.error("Please sign in to add to cart"); return; }
     const existing = items.find((i) => i.product_id === productId);
     if (existing) {
       await updateQuantity(existing.id, existing.quantity + quantity);
+      return;
+    }
+    if (!user) {
+      const { data: product, error } = await supabase
+        .from("products")
+        .select("id, name, price, image_url, seller_id, is_active")
+        .eq("id", productId)
+        .eq("is_active", true)
+        .single();
+      if (error || !product) { toast.error("Product not found"); return; }
+      saveGuestCart([...items, { id: `guest-${productId}`, product_id: productId, quantity, product } as CartItem]);
+      toast.success("Added to cart");
       return;
     }
     const { error } = await supabase.from("cart_items").insert({
@@ -67,19 +89,27 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const updateQuantity = async (itemId: string, quantity: number) => {
     if (quantity < 1) return removeFromCart(itemId);
+    if (!user) {
+      saveGuestCart(items.map((item) => item.id === itemId ? { ...item, quantity } : item));
+      return;
+    }
     const { error } = await supabase.from("cart_items").update({ quantity }).eq("id", itemId);
     if (error) { toast.error(error.message); return; }
     await refresh();
   };
 
   const removeFromCart = async (itemId: string) => {
+    if (!user) {
+      saveGuestCart(items.filter((item) => item.id !== itemId));
+      return;
+    }
     const { error } = await supabase.from("cart_items").delete().eq("id", itemId);
     if (error) { toast.error(error.message); return; }
     await refresh();
   };
 
   const clearCart = async () => {
-    if (!user) return;
+    if (!user) { saveGuestCart([]); return; }
     await supabase.from("cart_items").delete().eq("user_id", user.id);
     setItems([]);
   };
