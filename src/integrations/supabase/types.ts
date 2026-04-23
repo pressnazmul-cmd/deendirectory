@@ -249,7 +249,7 @@ export type Database = {
       }
       orders: {
         Row: {
-          buyer_id: string
+          buyer_id: string | null
           buyer_name: string
           buyer_phone: string
           created_at: string
@@ -268,7 +268,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          buyer_id: string
+          buyer_id?: string | null
           buyer_name: string
           buyer_phone: string
           created_at?: string
@@ -287,7 +287,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          buyer_id?: string
+          buyer_id?: string | null
           buyer_name?: string
           buyer_phone?: string
           created_at?: string
