@@ -24,7 +24,6 @@ const ProductsPage = () => {
   const [manageOpen, setManageOpen] = useState(false);
 
   const handleBuyNow = async (productId: string) => {
-    if (!user) { navigate("/auth"); return; }
     await addToCart(productId, 1);
     navigate("/checkout");
   };

@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,26 +8,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ShoppingCart, Trash2, Plus, Minus, ArrowRight, ShoppingBag } from "lucide-react";
 
 const CartPage = () => {
-  const { user } = useAuth();
   const { t } = useLanguage();
   const { items, loading, updateQuantity, removeFromCart } = useCart();
   const navigate = useNavigate();
 
   const subtotal = items.reduce((s, i) => s + (Number(i.product.price) || 0) * i.quantity, 0);
-
-  if (!user) {
-    return (
-      <div className="flex min-h-screen flex-col bg-background">
-        <Header />
-        <main className="container flex-1 py-12 max-w-3xl text-center">
-          <ShoppingCart className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-          <h1 className="text-2xl font-bold mb-2">{t("কার্ট দেখতে সাইন ইন করুন", "Sign in to view your cart")}</h1>
-          <Link to="/auth"><Button className="mt-4">{t("সাইন ইন", "Sign In")}</Button></Link>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
