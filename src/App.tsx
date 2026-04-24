@@ -19,6 +19,7 @@ import ProductsPage from "./pages/ProductsPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrdersPage from "./pages/OrdersPage";
+import TrackOrderPage from "./pages/TrackOrderPage";
 import NotFound from "./pages/NotFound";
 import { CartProvider } from "@/contexts/CartContext";
 
@@ -49,6 +50,8 @@ const App = () => (
                   <Route path="/cart" element={<CartPage />} />
                   <Route path="/checkout" element={<CheckoutPage />} />
                   <Route path="/orders" element={<OrdersPage />} />
+                  <Route path="/track" element={<TrackOrderPage />} />
+                  <Route path="/track/:orderId" element={<TrackOrderPage />} />
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="/auth" element={<AuthPage />} />
                   <Route path="/profile" element={<ProfilePage />} />

@@ -27,7 +27,9 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("+88");
+  const [email, setEmail] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   const [address, setAddress] = useState("");
   const [area, setArea] = useState<DeliveryArea>("inside_dhaka");
   const [payment, setPayment] = useState<PaymentMethod>("cod");
@@ -38,9 +40,25 @@ const CheckoutPage = () => {
   useEffect(() => {
     if (profile) {
       setName(profile.full_name || "");
-      setPhone(profile.mobile || "");
+      if (profile.mobile) {
+        const digits = profile.mobile.replace(/\D/g, "").replace(/^88/, "");
+        setPhone("+88" + digits);
+      }
     }
   }, [profile]);
+
+  // Phone input handler — always keep +88 prefix, only digits after
+  const handlePhoneChange = (val: string) => {
+    let digits = val.replace(/\D/g, "");
+    if (digits.startsWith("88")) digits = digits.slice(2);
+    setPhone("+88" + digits);
+  };
+
+  const handleWhatsappChange = (val: string) => {
+    let digits = val.replace(/\D/g, "");
+    if (digits.startsWith("88")) digits = digits.slice(2);
+    setWhatsapp(digits ? "+88" + digits : "");
+  };
 
   const { data: settings } = useQuery({
     queryKey: ["delivery-settings"],
@@ -71,8 +89,28 @@ const CheckoutPage = () => {
   const grandTotal = subtotal + totalDeliveryFee;
 
   const placeOrder = async () => {
-    if (!name.trim() || !phone.trim() || !address.trim()) {
+    if (!name.trim() || !address.trim()) {
       toast.error(t("সব তথ্য পূরণ করুন", "Please fill all required fields")); return;
+    }
+    // Phone: must be +88 followed by exactly 11 digits
+    const phoneDigits = phone.replace(/^\+88/, "").replace(/\D/g, "");
+    if (phoneDigits.length !== 11) {
+      toast.error(t("অনুগ্রহ করে নম্বরটি যাচাই করুন এবং সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন", "Please check the number & insert actual 11-digit number"));
+      return;
+    }
+    // Email: mandatory + valid
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim() || !emailRe.test(email.trim())) {
+      toast.error(t("সঠিক ইমেইল দিন", "Please enter a valid email"));
+      return;
+    }
+    // WhatsApp: optional, but if provided must be 11 digits after +88
+    if (whatsapp.trim()) {
+      const waDigits = whatsapp.replace(/^\+88/, "").replace(/\D/g, "");
+      if (waDigits.length !== 11) {
+        toast.error(t("WhatsApp নম্বর ১১ সংখ্যার হতে হবে", "WhatsApp number must be 11 digits"));
+        return;
+      }
     }
     if ((payment === "bkash" || payment === "nagad") && !txnId.trim()) {
       toast.error(t("ট্রানজেকশন ID দিন", "Please enter transaction ID")); return;
@@ -80,11 +118,13 @@ const CheckoutPage = () => {
     if (items.length === 0) { toast.error("Cart is empty"); return; }
 
     setSubmitting(true);
+    let lastOrderId = "";
     try {
       for (const [sellerId, sellerItems] of sellerGroups) {
         const sub = sellerItems.reduce((s, i) => s + (Number(i.product.price) || 0) * i.quantity, 0);
         const total = sub + deliveryFee;
         const orderId = crypto.randomUUID();
+        lastOrderId = orderId;
 
         const { error: orderErr } = await supabase.from("orders").insert({
           id: orderId,
@@ -92,6 +132,8 @@ const CheckoutPage = () => {
           seller_id: sellerId,
           buyer_name: name.trim(),
           buyer_phone: phone.trim(),
+          buyer_email: email.trim(),
+          buyer_whatsapp: whatsapp.trim() || null,
           delivery_address: address.trim(),
           delivery_area: area,
           delivery_fee: deliveryFee,
@@ -119,7 +161,7 @@ const CheckoutPage = () => {
 
       await clearCart();
       toast.success(t("অর্ডার সফলভাবে সম্পন্ন হয়েছে!", "Order placed successfully!"));
-      navigate(user ? "/orders" : "/products");
+      navigate(user ? "/orders" : `/track/${lastOrderId}`);
     } catch (e: any) {
       toast.error(e.message);
     } finally {
@@ -159,12 +201,38 @@ const CheckoutPage = () => {
                   </div>
                   <div className="space-y-1.5">
                     <Label>{t("মোবাইল", "Phone")} *</Label>
-                    <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+8801..." />
+                    <Input
+                      value={phone}
+                      onChange={(e) => handlePhoneChange(e.target.value)}
+                      placeholder="+8801XXXXXXXXX"
+                      inputMode="tel"
+                    />
+                    <p className="text-[11px] text-muted-foreground">{t("+88 এর পর ১১ সংখ্যার মোবাইল নম্বর দিন", "Enter 11-digit mobile number after +88")}</p>
                   </div>
                 </div>
                 <div className="space-y-1.5">
                   <Label>{t("সম্পূর্ণ ঠিকানা", "Full Address")} *</Label>
                   <Textarea value={address} onChange={(e) => setAddress(e.target.value)} rows={2} placeholder={t("বাড়ি/রাস্তা/এলাকা/থানা/জেলা", "House/Road/Area/Thana/District")} />
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label>Email ID *</Label>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@example.com"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>WhatsApp Number</Label>
+                    <Input
+                      value={whatsapp}
+                      onChange={(e) => handleWhatsappChange(e.target.value)}
+                      placeholder="+8801XXXXXXXXX"
+                      inputMode="tel"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label>{t("ডেলিভারি এলাকা", "Delivery Area")}</Label>

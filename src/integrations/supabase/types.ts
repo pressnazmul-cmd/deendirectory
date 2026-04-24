@@ -249,9 +249,11 @@ export type Database = {
       }
       orders: {
         Row: {
+          buyer_email: string | null
           buyer_id: string | null
           buyer_name: string
           buyer_phone: string
+          buyer_whatsapp: string | null
           created_at: string
           delivery_address: string
           delivery_area: string
@@ -268,9 +270,11 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          buyer_email?: string | null
           buyer_id?: string | null
           buyer_name: string
           buyer_phone: string
+          buyer_whatsapp?: string | null
           created_at?: string
           delivery_address: string
           delivery_area?: string
@@ -287,9 +291,11 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          buyer_email?: string | null
           buyer_id?: string | null
           buyer_name?: string
           buyer_phone?: string
+          buyer_whatsapp?: string | null
           created_at?: string
           delivery_address?: string
           delivery_area?: string
