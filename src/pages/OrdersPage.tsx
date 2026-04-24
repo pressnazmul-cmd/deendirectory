@@ -72,13 +72,39 @@ const OrdersPage = () => {
     qc.invalidateQueries({ queryKey: ["my-orders"] });
   };
 
-  const filteredBuyerOrders = useMemo(() => (
-    buyerTab === "all" ? buyerOrders || [] : (buyerOrders || []).filter((o: any) => o.status === buyerTab)
-  ), [buyerOrders, buyerTab]);
+  const filteredBuyerOrders = buyerOrders || [];
 
-  const filteredSellerOrders = useMemo(() => (
-    sellerTab === "all" ? sellerOrders || [] : (sellerOrders || []).filter((o: any) => o.status === sellerTab)
-  ), [sellerOrders, sellerTab]);
+  const filteredSellerOrders = useMemo(() => {
+    let list = sellerOrders || [];
+    if (sellerTab !== "all") list = list.filter((o: any) => o.status === sellerTab);
+
+    const now = new Date();
+    const startOfDay = (d: Date) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+    const endOfDay = (d: Date) => { const x = new Date(d); x.setHours(23, 59, 59, 999); return x; };
+
+    let from: Date | null = null;
+    let to: Date | null = null;
+
+    if (dateRangeTab === "today") {
+      from = startOfDay(now); to = endOfDay(now);
+    } else if (dateRangeTab === "yesterday") {
+      const y = new Date(now); y.setDate(y.getDate() - 1);
+      from = startOfDay(y); to = endOfDay(y);
+    } else if (dateRangeTab === "last7") {
+      const s = new Date(now); s.setDate(s.getDate() - 6);
+      from = startOfDay(s); to = endOfDay(now);
+    } else if (dateRangeTab === "last15") {
+      const s = new Date(now); s.setDate(s.getDate() - 14);
+      from = startOfDay(s); to = endOfDay(now);
+    } else if (dateRangeTab === "custom") {
+      if (fromDate) from = startOfDay(new Date(fromDate));
+      if (toDate) to = endOfDay(new Date(toDate));
+    }
+
+    if (from) list = list.filter((o: any) => new Date(o.created_at) >= from!);
+    if (to) list = list.filter((o: any) => new Date(o.created_at) <= to!);
+    return list;
+  }, [sellerOrders, sellerTab, dateRangeTab, fromDate, toDate]);
 
   const downloadInvoice = (o: any) => {
     const doc = new jsPDF();
