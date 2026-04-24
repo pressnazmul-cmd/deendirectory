@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { GraduationCap, LogIn, User, LogOut, Moon, Sun, Globe, ShoppingCart, Package } from "lucide-react";
+import { GraduationCap, LogIn, User, LogOut, Moon, Sun, Globe, ShoppingCart, Package, Truck } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useState } from "react";
 import { useTheme } from "next-themes";
@@ -98,6 +98,13 @@ const Header = () => {
                   {itemCount}
                 </span>
               )}
+            </Button>
+          </Link>
+
+          {/* Order Tracking */}
+          <Link to="/track">
+            <Button variant="ghost" size="icon" className="h-9 w-9" title={t("অর্ডার ট্র্যাক", "Track Order")}>
+              <Truck className="h-4 w-4" />
             </Button>
           </Link>
 
