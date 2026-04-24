@@ -89,8 +89,28 @@ const CheckoutPage = () => {
   const grandTotal = subtotal + totalDeliveryFee;
 
   const placeOrder = async () => {
-    if (!name.trim() || !phone.trim() || !address.trim()) {
+    if (!name.trim() || !address.trim()) {
       toast.error(t("সব তথ্য পূরণ করুন", "Please fill all required fields")); return;
+    }
+    // Phone: must be +88 followed by exactly 11 digits
+    const phoneDigits = phone.replace(/^\+88/, "").replace(/\D/g, "");
+    if (phoneDigits.length !== 11) {
+      toast.error(t("অনুগ্রহ করে নম্বরটি যাচাই করুন এবং সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন", "Please check the number & insert actual 11-digit number"));
+      return;
+    }
+    // Email: mandatory + valid
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim() || !emailRe.test(email.trim())) {
+      toast.error(t("সঠিক ইমেইল দিন", "Please enter a valid email"));
+      return;
+    }
+    // WhatsApp: optional, but if provided must be 11 digits after +88
+    if (whatsapp.trim()) {
+      const waDigits = whatsapp.replace(/^\+88/, "").replace(/\D/g, "");
+      if (waDigits.length !== 11) {
+        toast.error(t("WhatsApp নম্বর ১১ সংখ্যার হতে হবে", "WhatsApp number must be 11 digits"));
+        return;
+      }
     }
     if ((payment === "bkash" || payment === "nagad") && !txnId.trim()) {
       toast.error(t("ট্রানজেকশন ID দিন", "Please enter transaction ID")); return;
@@ -98,11 +118,13 @@ const CheckoutPage = () => {
     if (items.length === 0) { toast.error("Cart is empty"); return; }
 
     setSubmitting(true);
+    let lastOrderId = "";
     try {
       for (const [sellerId, sellerItems] of sellerGroups) {
         const sub = sellerItems.reduce((s, i) => s + (Number(i.product.price) || 0) * i.quantity, 0);
         const total = sub + deliveryFee;
         const orderId = crypto.randomUUID();
+        lastOrderId = orderId;
 
         const { error: orderErr } = await supabase.from("orders").insert({
           id: orderId,
@@ -110,6 +132,8 @@ const CheckoutPage = () => {
           seller_id: sellerId,
           buyer_name: name.trim(),
           buyer_phone: phone.trim(),
+          buyer_email: email.trim(),
+          buyer_whatsapp: whatsapp.trim() || null,
           delivery_address: address.trim(),
           delivery_area: area,
           delivery_fee: deliveryFee,
@@ -137,7 +161,7 @@ const CheckoutPage = () => {
 
       await clearCart();
       toast.success(t("অর্ডার সফলভাবে সম্পন্ন হয়েছে!", "Order placed successfully!"));
-      navigate(user ? "/orders" : "/products");
+      navigate(user ? "/orders" : `/track/${lastOrderId}`);
     } catch (e: any) {
       toast.error(e.message);
     } finally {
