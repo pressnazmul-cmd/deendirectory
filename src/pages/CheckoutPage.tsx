@@ -201,12 +201,38 @@ const CheckoutPage = () => {
                   </div>
                   <div className="space-y-1.5">
                     <Label>{t("মোবাইল", "Phone")} *</Label>
-                    <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+8801..." />
+                    <Input
+                      value={phone}
+                      onChange={(e) => handlePhoneChange(e.target.value)}
+                      placeholder="+8801XXXXXXXXX"
+                      inputMode="tel"
+                    />
+                    <p className="text-[11px] text-muted-foreground">{t("+88 এর পর ১১ সংখ্যার মোবাইল নম্বর দিন", "Enter 11-digit mobile number after +88")}</p>
                   </div>
                 </div>
                 <div className="space-y-1.5">
                   <Label>{t("সম্পূর্ণ ঠিকানা", "Full Address")} *</Label>
                   <Textarea value={address} onChange={(e) => setAddress(e.target.value)} rows={2} placeholder={t("বাড়ি/রাস্তা/এলাকা/থানা/জেলা", "House/Road/Area/Thana/District")} />
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label>Email ID *</Label>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@example.com"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>WhatsApp Number</Label>
+                    <Input
+                      value={whatsapp}
+                      onChange={(e) => handleWhatsappChange(e.target.value)}
+                      placeholder="+8801XXXXXXXXX"
+                      inputMode="tel"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label>{t("ডেলিভারি এলাকা", "Delivery Area")}</Label>
