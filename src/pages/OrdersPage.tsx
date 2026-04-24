@@ -259,6 +259,35 @@ const OrdersPage = () => {
               </Button>
             </div>
             {renderStatusTabs(sellerTab, setSellerTab)}
+            <div className="mt-3">
+              <Tabs value={dateRangeTab} onValueChange={setDateRangeTab} className="overflow-x-auto">
+                <TabsList className="h-auto min-w-max flex-wrap justify-start">
+                  <TabsTrigger value="all">{t("সব", "All")}</TabsTrigger>
+                  <TabsTrigger value="today">{t("আজ", "Today")}</TabsTrigger>
+                  <TabsTrigger value="yesterday">{t("গতকাল", "Yesterday")}</TabsTrigger>
+                  <TabsTrigger value="last7">{t("শেষ ৭ দিন", "Last 7 Days")}</TabsTrigger>
+                  <TabsTrigger value="last15">{t("শেষ ১৫ দিন", "Last 15 Days")}</TabsTrigger>
+                  <TabsTrigger value="custom"><CalendarRange className="mr-1 h-4 w-4" />{t("তারিখ", "From - To")}</TabsTrigger>
+                </TabsList>
+              </Tabs>
+              {dateRangeTab === "custom" && (
+                <div className="mt-3 flex flex-wrap items-end gap-3">
+                  <div>
+                    <Label className="text-xs">{t("থেকে", "From")}</Label>
+                    <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-9" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">{t("পর্যন্ত", "To")}</Label>
+                    <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-9" />
+                  </div>
+                  {(fromDate || toDate) && (
+                    <Button variant="ghost" size="sm" onClick={() => { setFromDate(""); setToDate(""); }}>
+                      {t("রিসেট", "Reset")}
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
             <div className="mt-3 space-y-3">{filteredSellerOrders.map((o) => renderOrder(o, true))}</div>
           </section>
         )}
