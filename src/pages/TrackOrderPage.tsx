@@ -19,29 +19,46 @@ const STAGES = [
   { key: "delivered", labelBn: "ডেলিভার্ড", labelEn: "Delivered", icon: Package },
 ];
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const TrackOrderPage = () => {
   const { t } = useLanguage();
   const { orderId: paramId } = useParams();
   const [orderId, setOrderId] = useState(paramId || "");
-  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState<any>(null);
   const [items, setItems] = useState<any[]>([]);
 
-  const search = async (id?: string, ph?: string) => {
+  const search = async (id?: string) => {
     const useId = (id ?? orderId).trim();
-    const usePhone = (ph ?? phone).trim();
     if (!useId) { toast.error(t("অর্ডার ID দিন", "Please enter Order ID")); return; }
     setLoading(true);
     setOrder(null); setItems([]);
     try {
-      let query = supabase.from("orders").select("*").eq("id", useId);
-      if (usePhone) query = query.eq("buyer_phone", usePhone);
-      const { data, error } = await query.maybeSingle();
-      if (error) throw error;
+      let data: any = null;
+      if (UUID_RE.test(useId)) {
+        const res = await supabase.from("orders").select("*").eq("id", useId).maybeSingle();
+        if (res.error) throw res.error;
+        data = res.data;
+      } else {
+        // Partial ID search (e.g. first 8 chars)
+        const res = await supabase
+          .from("orders")
+          .select("*")
+          .ilike("id", `${useId}%`)
+          .order("created_at", { ascending: false })
+          .limit(2);
+        if (res.error) throw res.error;
+        if ((res.data?.length || 0) > 1) {
+          toast.error(t("একাধিক অর্ডার পাওয়া গেছে, পূর্ণ ID দিন", "Multiple orders matched, please enter full ID"));
+          setLoading(false);
+          return;
+        }
+        data = res.data?.[0] || null;
+      }
       if (!data) { toast.error(t("অর্ডার পাওয়া যায়নি", "Order not found")); return; }
       setOrder(data);
-      const { data: it } = await supabase.from("order_items").select("*").eq("order_id", useId);
+      const { data: it } = await supabase.from("order_items").select("*").eq("order_id", data.id);
       setItems(it || []);
     } catch (e: any) {
       toast.error(e.message);
@@ -51,7 +68,7 @@ const TrackOrderPage = () => {
   };
 
   useEffect(() => {
-    if (paramId) search(paramId, "");
+    if (paramId) search(paramId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paramId]);
 
@@ -63,17 +80,18 @@ const TrackOrderPage = () => {
       <Header />
       <main className="container flex-1 py-6 max-w-3xl">
         <h1 className="text-2xl font-bold mb-1">{t("অর্ডার ট্র্যাকিং", "Order Tracking")}</h1>
-        <p className="text-sm text-muted-foreground mb-6">{t("আপনার অর্ডারের বর্তমান অবস্থা জানতে নিচের তথ্য দিন", "Enter your details to check your order status")}</p>
+        <p className="text-sm text-muted-foreground mb-6">{t("আপনার অর্ডার ID দিয়ে স্ট্যাটাস দেখুন", "Enter your Order ID to check status")}</p>
 
         <Card className="mb-6">
           <CardContent className="p-4 space-y-3">
             <div className="space-y-1.5">
               <Label>{t("অর্ডার ID", "Order ID")} *</Label>
-              <Input value={orderId} onChange={(e) => setOrderId(e.target.value)} placeholder="xxxxxxxx-xxxx-..." />
-            </div>
-            <div className="space-y-1.5">
-              <Label>{t("মোবাইল নম্বর (ঐচ্ছিক)", "Phone Number (optional)")}</Label>
-              <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+8801XXXXXXXXX" />
+              <Input
+                value={orderId}
+                onChange={(e) => setOrderId(e.target.value)}
+                placeholder={t("সম্পূর্ণ অথবা প্রথম ৮ অক্ষর", "Full ID or first 8 characters")}
+                onKeyDown={(e) => { if (e.key === "Enter") search(); }}
+              />
             </div>
             <Button onClick={() => search()} disabled={loading} className="w-full gap-2">
               <Search className="h-4 w-4" /> {loading ? t("খোঁজা হচ্ছে...", "Searching...") : t("ট্র্যাক করুন", "Track Order")}
