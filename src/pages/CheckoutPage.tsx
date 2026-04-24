@@ -27,7 +27,9 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState("+88");
+  const [email, setEmail] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
   const [address, setAddress] = useState("");
   const [area, setArea] = useState<DeliveryArea>("inside_dhaka");
   const [payment, setPayment] = useState<PaymentMethod>("cod");
@@ -38,9 +40,25 @@ const CheckoutPage = () => {
   useEffect(() => {
     if (profile) {
       setName(profile.full_name || "");
-      setPhone(profile.mobile || "");
+      if (profile.mobile) {
+        const digits = profile.mobile.replace(/\D/g, "").replace(/^88/, "");
+        setPhone("+88" + digits);
+      }
     }
   }, [profile]);
+
+  // Phone input handler — always keep +88 prefix, only digits after
+  const handlePhoneChange = (val: string) => {
+    let digits = val.replace(/\D/g, "");
+    if (digits.startsWith("88")) digits = digits.slice(2);
+    setPhone("+88" + digits);
+  };
+
+  const handleWhatsappChange = (val: string) => {
+    let digits = val.replace(/\D/g, "");
+    if (digits.startsWith("88")) digits = digits.slice(2);
+    setWhatsapp(digits ? "+88" + digits : "");
+  };
 
   const { data: settings } = useQuery({
     queryKey: ["delivery-settings"],
