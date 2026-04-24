@@ -241,7 +241,6 @@ const OrdersPage = () => {
           <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
             <ShoppingBag className="h-5 w-5 text-primary" />{t("আমার অর্ডার", "My Orders")} ({buyerOrders?.length || 0})
           </h2>
-          {renderStatusTabs(buyerTab, setBuyerTab)}
           {!buyerOrders?.length ? (
             <p className="text-muted-foreground text-sm">{t("কোনো অর্ডার নেই", "No orders yet")}</p>
           ) : (
