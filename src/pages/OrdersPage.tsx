@@ -35,8 +35,10 @@ const OrdersPage = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const qc = useQueryClient();
-  const [buyerTab, setBuyerTab] = useState("all");
   const [sellerTab, setSellerTab] = useState("all");
+  const [dateRangeTab, setDateRangeTab] = useState("all");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const { data: buyerOrders } = useQuery({
     queryKey: ["my-orders", user?.id],
