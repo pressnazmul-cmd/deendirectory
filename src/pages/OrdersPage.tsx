@@ -10,8 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
-import { Download, FileText, Package, ShoppingBag } from "lucide-react";
+import { Download, FileText, Package, ShoppingBag, CalendarRange } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import jsPDF from "jspdf";
@@ -33,8 +35,10 @@ const OrdersPage = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
   const qc = useQueryClient();
-  const [buyerTab, setBuyerTab] = useState("all");
   const [sellerTab, setSellerTab] = useState("all");
+  const [dateRangeTab, setDateRangeTab] = useState("all");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const { data: buyerOrders } = useQuery({
     queryKey: ["my-orders", user?.id],
@@ -68,13 +72,39 @@ const OrdersPage = () => {
     qc.invalidateQueries({ queryKey: ["my-orders"] });
   };
 
-  const filteredBuyerOrders = useMemo(() => (
-    buyerTab === "all" ? buyerOrders || [] : (buyerOrders || []).filter((o: any) => o.status === buyerTab)
-  ), [buyerOrders, buyerTab]);
+  const filteredBuyerOrders = buyerOrders || [];
 
-  const filteredSellerOrders = useMemo(() => (
-    sellerTab === "all" ? sellerOrders || [] : (sellerOrders || []).filter((o: any) => o.status === sellerTab)
-  ), [sellerOrders, sellerTab]);
+  const filteredSellerOrders = useMemo(() => {
+    let list = sellerOrders || [];
+    if (sellerTab !== "all") list = list.filter((o: any) => o.status === sellerTab);
+
+    const now = new Date();
+    const startOfDay = (d: Date) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+    const endOfDay = (d: Date) => { const x = new Date(d); x.setHours(23, 59, 59, 999); return x; };
+
+    let from: Date | null = null;
+    let to: Date | null = null;
+
+    if (dateRangeTab === "today") {
+      from = startOfDay(now); to = endOfDay(now);
+    } else if (dateRangeTab === "yesterday") {
+      const y = new Date(now); y.setDate(y.getDate() - 1);
+      from = startOfDay(y); to = endOfDay(y);
+    } else if (dateRangeTab === "last7") {
+      const s = new Date(now); s.setDate(s.getDate() - 6);
+      from = startOfDay(s); to = endOfDay(now);
+    } else if (dateRangeTab === "last15") {
+      const s = new Date(now); s.setDate(s.getDate() - 14);
+      from = startOfDay(s); to = endOfDay(now);
+    } else if (dateRangeTab === "custom") {
+      if (fromDate) from = startOfDay(new Date(fromDate));
+      if (toDate) to = endOfDay(new Date(toDate));
+    }
+
+    if (from) list = list.filter((o: any) => new Date(o.created_at) >= from!);
+    if (to) list = list.filter((o: any) => new Date(o.created_at) <= to!);
+    return list;
+  }, [sellerOrders, sellerTab, dateRangeTab, fromDate, toDate]);
 
   const downloadInvoice = (o: any) => {
     const doc = new jsPDF();
@@ -211,7 +241,6 @@ const OrdersPage = () => {
           <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
             <ShoppingBag className="h-5 w-5 text-primary" />{t("আমার অর্ডার", "My Orders")} ({buyerOrders?.length || 0})
           </h2>
-          {renderStatusTabs(buyerTab, setBuyerTab)}
           {!buyerOrders?.length ? (
             <p className="text-muted-foreground text-sm">{t("কোনো অর্ডার নেই", "No orders yet")}</p>
           ) : (
@@ -230,6 +259,35 @@ const OrdersPage = () => {
               </Button>
             </div>
             {renderStatusTabs(sellerTab, setSellerTab)}
+            <div className="mt-3">
+              <Tabs value={dateRangeTab} onValueChange={setDateRangeTab} className="overflow-x-auto">
+                <TabsList className="h-auto min-w-max flex-wrap justify-start">
+                  <TabsTrigger value="all">{t("সব", "All")}</TabsTrigger>
+                  <TabsTrigger value="today">{t("আজ", "Today")}</TabsTrigger>
+                  <TabsTrigger value="yesterday">{t("গতকাল", "Yesterday")}</TabsTrigger>
+                  <TabsTrigger value="last7">{t("শেষ ৭ দিন", "Last 7 Days")}</TabsTrigger>
+                  <TabsTrigger value="last15">{t("শেষ ১৫ দিন", "Last 15 Days")}</TabsTrigger>
+                  <TabsTrigger value="custom"><CalendarRange className="mr-1 h-4 w-4" />{t("তারিখ", "From - To")}</TabsTrigger>
+                </TabsList>
+              </Tabs>
+              {dateRangeTab === "custom" && (
+                <div className="mt-3 flex flex-wrap items-end gap-3">
+                  <div>
+                    <Label className="text-xs">{t("থেকে", "From")}</Label>
+                    <Input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="h-9" />
+                  </div>
+                  <div>
+                    <Label className="text-xs">{t("পর্যন্ত", "To")}</Label>
+                    <Input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="h-9" />
+                  </div>
+                  {(fromDate || toDate) && (
+                    <Button variant="ghost" size="sm" onClick={() => { setFromDate(""); setToDate(""); }}>
+                      {t("রিসেট", "Reset")}
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
             <div className="mt-3 space-y-3">{filteredSellerOrders.map((o) => renderOrder(o, true))}</div>
           </section>
         )}
