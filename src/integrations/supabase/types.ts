@@ -719,6 +719,36 @@ export type Database = {
     }
     Functions: {
       can_add_order_items: { Args: { _order_id: string }; Returns: boolean }
+      find_order_by_prefix: {
+        Args: { _prefix: string }
+        Returns: {
+          buyer_email: string | null
+          buyer_id: string | null
+          buyer_name: string
+          buyer_phone: string
+          buyer_whatsapp: string | null
+          created_at: string
+          delivery_address: string
+          delivery_area: string
+          delivery_fee: number
+          id: string
+          notes: string | null
+          payment_method: string
+          payment_status: string
+          seller_id: string
+          status: string
+          subtotal: number
+          total: number
+          transaction_id: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "orders"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
