@@ -45,7 +45,7 @@ const TrackOrderPage = () => {
         const res = await supabase
           .from("orders")
           .select("*")
-          .ilike("id", `${useId}%`)
+          .filter("id::text", "ilike", `${useId.toLowerCase()}%`)
           .order("created_at", { ascending: false })
           .limit(2);
         if (res.error) throw res.error;
