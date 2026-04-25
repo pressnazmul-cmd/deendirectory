@@ -41,13 +41,8 @@ const TrackOrderPage = () => {
         if (res.error) throw res.error;
         data = res.data;
       } else {
-        // Partial ID search (e.g. first 8 chars)
-        const res = await supabase
-          .from("orders")
-          .select("*")
-          .ilike("id", `${useId}%`)
-          .order("created_at", { ascending: false })
-          .limit(2);
+        // Partial ID prefix search via RPC (uuid columns can't use ilike directly)
+        const res = await supabase.rpc("find_order_by_prefix", { _prefix: useId.toLowerCase() });
         if (res.error) throw res.error;
         if ((res.data?.length || 0) > 1) {
           toast.error(t("একাধিক অর্ডার পাওয়া গেছে, পূর্ণ ID দিন", "Multiple orders matched, please enter full ID"));
